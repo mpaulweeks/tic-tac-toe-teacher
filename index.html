@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<!-- oh snap its tic tac toe -->
+
+<html>
+    <head>
+        <title>T4</title>
+        <link rel="shortcut icon" href="img/block_x.png" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=400">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+
+        <link rel="stylesheet" type="text/css" href="css/t4.css" />
+        <script src="js/t4.js"></script>
+    </head>
+
+<body>
+<div class="container text-center">
+<h1 >
+    Tic Tac Toe Teacher
+</h1>
+
+<p>work in progress</p>
+
+<div class="col-md-6">
+    <h3 id="turn-0">
+        Player X
+    </h3>
+    <h3 id="turn-1">
+        Player O
+    </h3>
+    <h3 id="victory-0">
+        Player X wins!
+    </h3>
+    <h3 id="victory-1">
+        Player O wins!
+    </h3>
+    <br/>
+    <div class="holder center-block">
+        <div id="block-0" data-id="0" class="block"></div>
+        <div id="block-1" data-id="1" class="block"></div>
+        <div id="block-2" data-id="2" class="block"></div>
+        <div class="float-clear"></div>
+    </div>
+    <div class="holder center-block">
+        <div id="block-3" data-id="3" class="block"></div>
+        <div id="block-4" data-id="4" class="block"></div>
+        <div id="block-5" data-id="5" class="block"></div>
+        <div class="float-clear"></div>
+    </div>
+    <div class="holder center-block">
+        <div id="block-6" data-id="6" class="block"></div>
+        <div id="block-7" data-id="7" class="block"></div>
+        <div id="block-8" data-id="8" class="block"></div>
+        <div class="float-clear"></div>
+    </div>
+    <br/>
+    <button id="reset">
+        RESET
+    </button>
+</div>
+<div class="col-md-6">
+    code goes here
+</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        ticTacToe();
+    });
+</script>
+</body>
+</html>
