@@ -1,12 +1,12 @@
 
-var boardFactory = function () {
+var boardFactory = function (robotBrain) {
     var self = {};
 
     var blockPictures = [
         'img/block_x.png',
         'img/block_o.png'
     ];
-    var playerId = 0;
+    var playerId = 0;  // either 0 or 1
     var emptyBlockPid = 2;
     var grid = [];
     var gameOver = false;
@@ -24,12 +24,12 @@ var boardFactory = function () {
     var resetGrid = function () {
         grid = [];
         for (var i = 0; i < 9; i++) {
-            grid.push(-1);
+            grid.push(emptyBlockPid);
         }
     };
 
     var makeMove = function (clickedBlock) {
-        if (grid[clickedBlock] < 0) {
+        if (grid[clickedBlock] == emptyBlockPid) {
             grid[clickedBlock] = playerId;
             return true;
         }
@@ -66,16 +66,22 @@ var boardFactory = function () {
 
     var didTheyWinWithBlocks = function (blocks) {
         blocks.sort();
-        var theyWon = false;
+        var winningMove = null;
         winningBlocks.forEach(function (subarray) {
-            theyWon = theyWon || containsSubArray(blocks, subarray);
+            if(!winningMove && containsSubArray(blocks, subarray)){
+                winningMove = subarray;
+            }
         });
-        return theyWon;
+        return winningMove;
+    };
+
+    var getOpponentId = function() {
+        return 1 - playerId;
     };
 
     var switchPlayer = function () {
         $('#turn-'+playerId).hide();
-        playerId = 1 - playerId;
+        playerId = getOpponentId();
         $('#turn-'+playerId).show();
     };
 
@@ -93,20 +99,23 @@ var boardFactory = function () {
 
         $('#turn-'+playerId).show();
         gameOver = false;
+
+        startTurn();
     };
 
     var checkForWin = function () {
-        var theyWon = didTheyJustWin();
-        if (theyWon) {
+        var winningMove = didTheyJustWin();
+        if (winningMove) {
             $('#turn-' + playerId).hide();
             $('#victory-' + playerId).show();
-            getOwnedBlocks(playerId).forEach(function(bid){
+            winningMove.forEach(function(bid){
                 $('#block-'+bid).addClass('highlight');
             });
             gameOver = true;
         }
         else {
             switchPlayer();
+            startTurn();
         }
     };
 
@@ -127,6 +136,31 @@ var boardFactory = function () {
         }
     };
 
+    function makeDto(){
+        var dto = {};
+        dto.freeSquares = getOwnedBlocks(emptyBlockPid);
+        dto.mySquares = getOwnedBlocks(playerId);
+        dto.opponentSquares = getOwnedBlocks(getOpponentId());
+        return dto;
+    }
+
+    var startTurn = function(){
+        if (playerId == robotBrain.id){
+            // todo: disable click events, wait 1 second, re-enable events
+            takeTurn(robotBrain.move(makeDto()));
+        } else {
+            // human turn: do nothing, wait for click event
+        }
+    }
+
+    var takeTurn = function(blockId){
+        var success = makeMove(blockId);
+        if (success) {
+            markBlock(blockId, playerId);
+            checkForWin();
+        }
+    }
+
     $('#reset').on('click', resetGame);
     $('.block').on('click', function () {
         if(gameOver){
@@ -134,11 +168,7 @@ var boardFactory = function () {
         }
         else{
             var blockId = $(this).data('id');
-            var success = makeMove(blockId);
-            if (success) {
-                markBlock(blockId, playerId);
-                checkForWin();
-            }
+            takeTurn(blockId);
         }
     });
 
@@ -146,6 +176,55 @@ var boardFactory = function () {
     return self;
 };
 
+// function determineMove(board, square){
+var sampleRobot = `
+    console.log(square.Center);
+    if (board.freeSquares.includes(square.Center)){
+        return square.Center;
+    }
+    return api.getRandom(board.freeSquares);
+`;
+
+var robotFactory = function(robotFuncText){
+    var self = {};
+
+    var api = (function(){
+        var self = {};
+
+        self.getRandom = function(arr){
+            return arr[Math.floor(Math.random() * arr.length)];
+        };
+
+        return self;
+    })();
+
+    var SQUARE = {
+        TopLeft: 0,
+        TopCenter: 1,
+        TopRight: 2,
+        CenterLeft: 3,
+        Center: 4,
+        CenterRight: 5,
+        BottomLeft: 6,
+        BottomCenter: 7,
+        BottomRight: 8,
+    };
+
+    var robotMover = new Function('board', 'api', 'square', robotFuncText);
+
+    self.move = function(board){
+        return robotMover(board, api, SQUARE);
+    }
+    self.id = Math.floor(Math.random() * 2);
+
+    return self;
+}
+
 function ticTacToe(){
-    boardFactory().reset();
+    function loadAI(){
+        var robot = robotFactory(sampleRobot);
+        var board = boardFactory(robot);
+        board.reset();
+    }
+    loadAI();
 }
