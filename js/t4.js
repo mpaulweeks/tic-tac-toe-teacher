@@ -243,7 +243,7 @@ var robotFactory = function(robotFuncText){
     return self;
 }
 
-var sampleRobot = `
+var simpleRobot = `
 if (board.freeSquares.includes(square.Center)){
     return square.Center;
 }
@@ -306,7 +306,7 @@ function ticTacToe(){
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
     editor.getSession().setMode("ace/mode/javascript");
-    editor.setValue(expertRobot);
+    editor.setValue(simpleRobot);
     var game = boardFactory();
 
     function loadRobot(){
@@ -314,6 +314,14 @@ function ticTacToe(){
         var robot = robotFactory(code);
         game.loadRobot(robot);
     }
-    $('#load').click(loadRobot);
+    $('#run').click(loadRobot);
+    $('#load-simple').click(function(){
+        editor.setValue(simpleRobot);
+        loadRobot();
+    });
+    $('#load-expert').click(function(){
+        editor.setValue(expertRobot);
+        loadRobot();
+    });
     loadRobot();
 }
