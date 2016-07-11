@@ -64,6 +64,7 @@ var boardFactory = function () {
     var emptyBlockPid = 2;
     var grid = [];
     var gameOver = false;
+    var inputDisabled = false;
     var robotBrain = null;
 
     function resetGrid() {
@@ -109,6 +110,7 @@ var boardFactory = function () {
         $('#turn-1').hide();
         $('#victory-0').hide();
         $('#victory-1').hide();
+        $('#draw').hide();
         for(var bid = 0; bid < grid.length; bid++){
             markBlock(bid, emptyBlockPid);
             $('#block-'+bid).removeClass('highlight');
@@ -131,7 +133,11 @@ var boardFactory = function () {
             });
             gameOver = true;
         }
-        else {
+        else if (getOwnedBlocks(emptyBlockPid).length == 0){
+            $('#turn-' + playerId).hide();
+            $('#draw').show();
+            gameOver = true;
+        } else {
             switchPlayer();
         }
     }
@@ -163,8 +169,11 @@ var boardFactory = function () {
 
     function startTurn(){
         if (playerId == robotBrain.id){
-            // todo: disable click events, wait 1 second, re-enable events
-            takeTurn(robotBrain.move(makeDto(), api));
+            inputDisabled = true;
+            setTimeout(function(){
+                takeTurn(robotBrain.move(makeDto(), api));
+                inputDisabled = false;
+            }, 500);
         } else {
             // human turn: do nothing, wait for click event
         }
@@ -180,7 +189,7 @@ var boardFactory = function () {
 
     $('#reset').on('click', resetGame);
     $('.block').on('click', function () {
-        if(gameOver){
+        if(gameOver || inputDisabled){
             // do nothing, wait for manual reset
         }
         else{
@@ -228,7 +237,8 @@ var robotFactory = function(robotFuncText){
     self.move = function(board, api){
         return robotMover(board, api, SQUARE);
     }
-    self.id = Math.floor(Math.random() * 2);
+    // self.id = Math.floor(Math.random() * 2);
+    self.id = 0; // robot is X
 
     return self;
 }
