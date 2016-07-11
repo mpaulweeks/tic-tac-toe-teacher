@@ -1,5 +1,5 @@
 
-var boardFactory = function (robotBrain) {
+var boardFactory = function () {
     var self = {};
 
     var blockPictures = [
@@ -20,23 +20,24 @@ var boardFactory = function (robotBrain) {
         [0, 4, 8],
         [2, 4, 6]
     ];
+    var robotBrain = null;
 
-    var resetGrid = function () {
+    function resetGrid() {
         grid = [];
         for (var i = 0; i < 9; i++) {
             grid.push(emptyBlockPid);
         }
-    };
+    }
 
-    var makeMove = function (clickedBlock) {
+    function makeMove(clickedBlock) {
         if (grid[clickedBlock] == emptyBlockPid) {
             grid[clickedBlock] = playerId;
             return true;
         }
         return false;
-    };
+    }
 
-    var getOwnedBlocks = function (pid) {
+    function getOwnedBlocks(pid) {
         var ownedBlocks = [];
         for (var i = 0; i < grid.length; i++) {
             if (grid[i] == pid) {
@@ -44,9 +45,9 @@ var boardFactory = function (robotBrain) {
             }
         }
         return ownedBlocks;
-    };
+    }
 
-    var containsSubArray = function (array, subarray) {
+    function containsSubArray(array, subarray) {
         var si = 0;
         var contains = false;
         array.forEach(function (val) {
@@ -58,13 +59,10 @@ var boardFactory = function (robotBrain) {
             }
         });
         return contains;
-    };
+    }
 
-    var didTheyJustWin = function () {
-        return didTheyWinWithBlocks(getOwnedBlocks(playerId));
-    };
-
-    var didTheyWinWithBlocks = function (blocks) {
+    function getWinningBlocks() {
+        var blocks = getOwnedBlocks(playerId);
         blocks.sort();
         var winningMove = null;
         winningBlocks.forEach(function (subarray) {
@@ -73,20 +71,21 @@ var boardFactory = function (robotBrain) {
             }
         });
         return winningMove;
-    };
+    }
 
-    var getOpponentId = function() {
+    function getOpponentId() {
         return 1 - playerId;
-    };
+    }
 
-    var switchPlayer = function () {
+    // view stuff
+    function switchPlayer() {
         $('#turn-'+playerId).hide();
         playerId = getOpponentId();
         $('#turn-'+playerId).show();
-    };
+        startTurn();
+    }
 
-    // view stuff
-    var resetGame = function () {
+    function resetGame() {
         resetGrid();
         $('#turn-0').hide();
         $('#turn-1').hide();
@@ -101,10 +100,10 @@ var boardFactory = function (robotBrain) {
         gameOver = false;
 
         startTurn();
-    };
+    }
 
-    var checkForWin = function () {
-        var winningMove = didTheyJustWin();
+    function checkForWin() {
+        var winningMove = getWinningBlocks();
         if (winningMove) {
             $('#turn-' + playerId).hide();
             $('#victory-' + playerId).show();
@@ -115,16 +114,15 @@ var boardFactory = function (robotBrain) {
         }
         else {
             switchPlayer();
-            startTurn();
         }
-    };
+    }
 
-    var displayImage = function(elm, pid) {
+    function displayImage(elm, pid) {
         var url = blockPictures[pid];
         elm.html('<img src="' + url + '" />');
     }
 
-    var markBlock = function(blockId, pid) {
+    function markBlock(blockId, pid) {
         var block = $('#block-'+blockId);
         if(pid === emptyBlockPid){
             block.empty();
@@ -134,7 +132,7 @@ var boardFactory = function (robotBrain) {
             displayImage(block, pid);
             block.addClass('filled');
         }
-    };
+    }
 
     function makeDto(){
         var dto = {};
@@ -144,7 +142,7 @@ var boardFactory = function (robotBrain) {
         return dto;
     }
 
-    var startTurn = function(){
+    function startTurn(){
         if (playerId == robotBrain.id){
             // todo: disable click events, wait 1 second, re-enable events
             takeTurn(robotBrain.move(makeDto()));
@@ -153,7 +151,7 @@ var boardFactory = function (robotBrain) {
         }
     }
 
-    var takeTurn = function(blockId){
+    function takeTurn(blockId){
         var success = makeMove(blockId);
         if (success) {
             markBlock(blockId, playerId);
@@ -164,7 +162,7 @@ var boardFactory = function (robotBrain) {
     $('#reset').on('click', resetGame);
     $('.block').on('click', function () {
         if(gameOver){
-            // do nothing
+            // do nothing, wait for manual reset
         }
         else{
             var blockId = $(this).data('id');
@@ -172,22 +170,17 @@ var boardFactory = function (robotBrain) {
         }
     });
 
-    self.reset = resetGame;
+    self.loadRobot = function(brain){
+        robotBrain = brain;
+        resetGame();
+    };
     return self;
 };
-
-// function determineMove(board, square){
-var sampleRobot = `
-    console.log(square.Center);
-    if (board.freeSquares.includes(square.Center)){
-        return square.Center;
-    }
-    return api.getRandom(board.freeSquares);
-`;
 
 var robotFactory = function(robotFuncText){
     var self = {};
 
+    var robotMover = new Function('board', 'api', 'square', robotFuncText);
     var api = (function(){
         var self = {};
 
@@ -197,7 +190,6 @@ var robotFactory = function(robotFuncText){
 
         return self;
     })();
-
     var SQUARE = {
         TopLeft: 0,
         TopCenter: 1,
@@ -210,8 +202,6 @@ var robotFactory = function(robotFuncText){
         BottomRight: 8,
     };
 
-    var robotMover = new Function('board', 'api', 'square', robotFuncText);
-
     self.move = function(board){
         return robotMover(board, api, SQUARE);
     }
@@ -220,11 +210,20 @@ var robotFactory = function(robotFuncText){
     return self;
 }
 
+var sampleRobot = `
+    console.log(square.Center);
+    if (board.freeSquares.includes(square.Center)){
+        return square.Center;
+    }
+    return api.getRandom(board.freeSquares);
+`;
+
 function ticTacToe(){
+    var game = boardFactory();
+
     function loadAI(){
         var robot = robotFactory(sampleRobot);
-        var board = boardFactory(robot);
-        board.reset();
+        game.loadRobot(robot);
     }
     loadAI();
 }
