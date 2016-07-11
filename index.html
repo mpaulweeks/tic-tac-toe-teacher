@@ -8,10 +8,10 @@
         <link rel="shortcut icon" href="img/block_x.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="viewport" content="width=400">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
-
         <link rel="stylesheet" type="text/css" href="css/t4.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+        <script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/t4.js"></script>
     </head>
 
@@ -23,7 +23,7 @@
 
 <p>work in progress</p>
 
-<div class="col-md-6">
+<div class="col-md-4">
     <h3 id="turn-0">
         Player X
     </h3>
@@ -60,9 +60,11 @@
         RESET
     </button>
 </div>
-<div class="col-md-6">
-    code goes here
+<div class="col-md-8 text-left">
+    <button id="load">Load</button>
+    <div id="editor"></div>
 </div>
+
 </div>
 <script type="text/javascript">
     $(document).ready(function () {

@@ -211,19 +211,24 @@ var robotFactory = function(robotFuncText){
 }
 
 var sampleRobot = `
-    console.log(square.Center);
-    if (board.freeSquares.includes(square.Center)){
-        return square.Center;
-    }
-    return api.getRandom(board.freeSquares);
+if (board.freeSquares.includes(square.Center)){
+    return square.Center;
+}
+return api.getRandom(board.freeSquares);
 `;
 
 function ticTacToe(){
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/javascript");
+    editor.setValue(sampleRobot);
     var game = boardFactory();
 
-    function loadAI(){
-        var robot = robotFactory(sampleRobot);
+    function loadRobot(){
+        var code = editor.getValue();
+        var robot = robotFactory(code);
         game.loadRobot(robot);
     }
-    loadAI();
+    $('#load').click(loadRobot);
+    loadRobot();
 }
