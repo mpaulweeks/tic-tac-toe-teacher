@@ -60,11 +60,12 @@ var boardFactory = function () {
         'img/block_x.png',
         'img/block_o.png'
     ];
-    var playerId = 0;  // either 0 or 1
+    var playerId = null;  // either 0 or 1
     var emptyBlockPid = 2;
     var grid = [];
-    var gameOver = false;
-    var inputDisabled = false;
+    var gameOver = null;
+    var drawGame = null;
+    var inputDisabled = true;
     var robotBrain = null;
 
     function resetGrid() {
@@ -98,27 +99,21 @@ var boardFactory = function () {
 
     // view stuff
     function switchPlayer() {
-        $('#turn-'+playerId).hide();
         playerId = getOpponentId();
-        $('#turn-'+playerId).show();
         startTurn();
     }
 
     function resetGame() {
+        playerId = 0;
+        gameOver = false;
+        drawGame = false;
+        inputDisabled = false;
         resetGrid();
-        $('#turn-0').hide();
-        $('#turn-1').hide();
-        $('#victory-0').hide();
-        $('#victory-1').hide();
-        $('#draw').hide();
         for(var bid = 0; bid < grid.length; bid++){
             markBlock(bid, emptyBlockPid);
             $('#block-'+bid).removeClass('highlight');
         }
-
-        $('#turn-'+playerId).show();
-        gameOver = false;
-
+        displayMessage();
         startTurn();
     }
 
@@ -126,20 +121,32 @@ var boardFactory = function () {
         var blocks = getOwnedBlocks(playerId);
         var winningMove = api.checkForWin(blocks);
         if (winningMove) {
-            $('#turn-' + playerId).hide();
-            $('#victory-' + playerId).show();
             winningMove.forEach(function(bid){
                 $('#block-'+bid).addClass('highlight');
             });
             gameOver = true;
         }
         else if (getOwnedBlocks(emptyBlockPid).length == 0){
-            $('#turn-' + playerId).hide();
-            $('#draw').show();
             gameOver = true;
+            drawGame = true;
         } else {
             switchPlayer();
         }
+        displayMessage();
+    }
+
+    function displayMessage(){
+        var playerName = "Human";
+        if (playerId == robotBrain.id){
+            playerName = "Robot";
+        }
+        var message = playerName + "'s turn";
+        if (drawGame){
+            message = "Draw Game";
+        } else if (gameOver) {
+            message = playerName + " wins!";
+        }
+        $('#message').html(message);
     }
 
     function displayImage(elm, pid) {
@@ -237,8 +244,7 @@ var robotFactory = function(robotFuncText){
     self.move = function(board, api){
         return robotMover(board, api, SQUARE);
     }
-    // self.id = Math.floor(Math.random() * 2);
-    self.id = 0; // robot is X
+    self.id = parseInt($('#settings input[name=turn]:checked').val());
 
     return self;
 }

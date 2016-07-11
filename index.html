@@ -24,20 +24,8 @@
 <p>work in progress</p>
 
 <div class="col-md-4">
-    <h3 id="turn-0">
-        Robot's Turn
-    </h3>
-    <h3 id="turn-1">
-        Human's Turn
-    </h3>
-    <h3 id="victory-0">
-        Robot wins!
-    </h3>
-    <h3 id="victory-1">
-        Human wins!
-    </h3>
-    <h3 id="draw">
-        Draw Game
+    <h3 id="message">
+        loading...
     </h3>
     <br/>
     <div class="holder center-block">
@@ -64,6 +52,13 @@
     </button>
 </div>
 <div class="col-md-8 text-left">
+    <span>
+        <form id="settings">
+            Robot plays:
+            <input type="radio" name="turn" value="0" checked> First (X)
+            <input type="radio" name="turn" value="1"> Second (O)
+        </form>
+    </span>
     <button id="run">Run</button>
     <button id="load-simple">Load Simple Robot</button>
     <button id="load-expert">Load Expert Robot</button>
