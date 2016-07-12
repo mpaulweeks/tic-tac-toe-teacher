@@ -330,4 +330,27 @@ function ticTacToe(){
         loadRobot();
     });
     loadRobot();
+
+    function exportGist(){
+        var data = {
+            "description": "posting gist test",
+            "public": false,
+            "files": {
+                "test.txt": {
+                    "content": editor.getValue(),
+                }
+            }
+        };
+        $.ajax({
+            url: 'https://api.github.com/gists',
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(data)
+        }).success( function(e) {
+            console.log(e);
+        }).error( function(e) {
+            console.warn("gist save error", e);
+        });
+    }
+    $('#export-gist').click(exportGist);
 }
