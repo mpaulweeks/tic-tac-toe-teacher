@@ -29,7 +29,13 @@ body {
     clear: both;
 }
 
-#editor {
+.code {
+    text-align: left;
     height: 600px;
     width: 100%;
+    margin-top: 5px;
+}
+
+.code.snippet {
+    height: 18px;
 }

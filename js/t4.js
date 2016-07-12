@@ -249,15 +249,15 @@ var robotFactory = function(robotFuncText){
     return self;
 }
 
-var simpleRobot = `
-if (board.freeSquares.includes(square.Center)){
+var simpleRobot = (
+`if (board.freeSquares.includes(square.Center)){
     return square.Center;
 }
 return api.getRandom(board.freeSquares);
-`;
+`);
 
-var expertRobot = `
-function determineWinningMoves(freeSquares, mySquares){
+var expertRobot = (
+`function determineWinningMoves(freeSquares, mySquares){
     var winningMoves = [];
     for (var i = 0; i < freeSquares.length; i++){
         var hypoMove = freeSquares[i];
@@ -305,28 +305,42 @@ return (
     // checkFunc(determineSetupMoves) ||
     api.getRandom(api.intersect(board.freeSquares, firstMoves)) ||
     api.getRandom(board.freeSquares)
-)
-`;
+)`);
 
 function ticTacToe(){
-    var editor = ace.edit("editor");
-    editor.setTheme("ace/theme/monokai");
-    editor.getSession().setMode("ace/mode/javascript");
-    editor.setValue(simpleRobot);
+    var editorCode = ace.edit("editor-code");
+    editorCode.setValue(simpleRobot);
+    var editorStart = ace.edit("editor-start");
+    editorStart.setValue('function determineRobotMove(board, api, square) {');
+    var editorEnd = ace.edit("editor-end");
+    editorEnd.setValue('}');
+    var editorDocs = ace.edit("editor-docs");
+    editorDocs.setValue(expertRobot);
+    [editorStart, editorEnd, editorDocs].forEach(function (editor){
+        editor.setReadOnly(true);
+    });
+    [editorCode, editorStart, editorEnd, editorDocs].forEach(function (editor){
+        editor.setTheme("ace/theme/monokai");
+        editor.getSession().setMode("ace/mode/javascript");
+    });
+    [editorStart, editorEnd].forEach(function (editor){
+        editor.getSession().setMode("ace/mode/text");
+    });
+
     var game = boardFactory();
 
     function loadRobot(){
-        var code = editor.getValue();
+        var code = editorCode.getValue();
         var robot = robotFactory(code);
         game.loadRobot(robot);
     }
     $('#run').click(loadRobot);
     $('#load-simple').click(function(){
-        editor.setValue(simpleRobot);
+        editorCode.setValue(simpleRobot);
         loadRobot();
     });
     $('#load-expert').click(function(){
-        editor.setValue(expertRobot);
+        editorCode.setValue(expertRobot);
         loadRobot();
     });
     loadRobot();
@@ -337,7 +351,7 @@ function ticTacToe(){
             "public": false,
             "files": {
                 "test.txt": {
-                    "content": editor.getValue(),
+                    "content": editorCode.getValue(),
                 }
             }
         };
