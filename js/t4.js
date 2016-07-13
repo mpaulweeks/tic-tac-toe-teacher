@@ -5,14 +5,14 @@ var boardFactory = function () {
     var api = (function(){
         var self = {};
         var winningBlocks = [
-            [0, 1, 2],
-            [3, 4, 5],
-            [6, 7, 8],
-            [0, 3, 6],
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
             [1, 4, 7],
             [2, 5, 8],
-            [0, 4, 8],
-            [2, 4, 6]
+            [3, 6, 9],
+            [1, 5, 9],
+            [3, 5, 7],
         ];
 
         function containsSubArray(array, subarray) {
@@ -62,7 +62,7 @@ var boardFactory = function () {
     ];
     var playerId = null;  // either 0 or 1
     var emptyBlockPid = 2;
-    var grid = [];
+    var grid = {};
     var gameOver = null;
     var drawGame = null;
     var inputDisabled = true;
@@ -70,8 +70,8 @@ var boardFactory = function () {
 
     function resetGrid() {
         grid = [];
-        for (var i = 0; i < 9; i++) {
-            grid.push(emptyBlockPid);
+        for (var i = 1; i <= 9; i++) {
+            grid[i] = emptyBlockPid;
         }
     }
 
@@ -85,8 +85,8 @@ var boardFactory = function () {
 
     function getOwnedBlocks(pid) {
         var ownedBlocks = [];
-        for (var i = 0; i < grid.length; i++) {
-            if (grid[i] == pid) {
+        for (var i = 1; i <= 9; i++) {
+            if (i in grid && grid[i] == pid) {
                 ownedBlocks.push(i);
             }
         }
@@ -218,15 +218,15 @@ var robotFactory = function(robotFuncText){
     var robotMover = new Function('board', 'api', 'square', robotFuncText);
 
     var SQUARE = {
-        TopLeft: 0,
-        TopCenter: 1,
-        TopRight: 2,
-        CenterLeft: 3,
-        Center: 4,
-        CenterRight: 5,
-        BottomLeft: 6,
-        BottomCenter: 7,
-        BottomRight: 8,
+        TopLeft: 1,
+        TopCenter: 2,
+        TopRight: 3,
+        CenterLeft: 4,
+        Center: 5,
+        CenterRight: 6,
+        BottomLeft: 7,
+        BottomCenter: 8,
+        BottomRight: 9,
     };
     SQUARE.CORNERS = [
         SQUARE.TopLeft,
