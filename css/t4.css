@@ -36,6 +36,10 @@ body {
     margin-top: 5px;
 }
 
+.code#editor-code {
+    height: 551px;
+}
+
 .code.snippet {
     height: 18px;
 }
