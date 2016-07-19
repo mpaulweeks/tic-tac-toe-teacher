@@ -62,6 +62,8 @@ var boardFactory = function () {
     ];
     var currentPlayerId = null;  // either 0 or 1
     var playerBrains = null;  // list of len 2
+    var robotTimeout = null;
+    var gameOverCallback = null;
     var emptyBlockPid = 2;
     var grid = {};
     var gameOver = null;
@@ -137,6 +139,9 @@ var boardFactory = function () {
             switchPlayer();
         }
         displayMessage();
+        if (gameOver && gameOverCallback){
+            gameOverCallback(getCurrentPlayer(), drawGame);
+        }
     }
 
     function displayMessage(){
@@ -180,7 +185,7 @@ var boardFactory = function () {
         if (cp.isRobot){
             setTimeout(function(){
                 takeTurn(cp.move(makeDto(), api));
-            }, 500);
+            }, robotTimeout);
         } else {
             // human turn: do nothing, wait for click event
             inputDisabled = false;
@@ -207,10 +212,12 @@ var boardFactory = function () {
         }
     });
 
-    self.loadBrains = function(brain1, brain2){
+    self.loadBrains = function(brain1, brain2, timeout, callback){
         brain1 = brain1 || humanBrain;
         brain2 = brain2 || humanBrain;
         playerBrains = [brain1, brain2];
+        robotTimeout = timeout || 500;
+        gameOverCallback = callback;
         resetGame();
     };
     return self;
@@ -221,10 +228,8 @@ var humanBrain = {
     isRobot: false,
 };
 
-var robotFactory = function(robotFuncText){
+var robotFactory = function(robotFuncText, robotName){
     var self = {};
-
-    var robotMover = new Function('board', 'api', 'square', robotFuncText);
 
     var SQUARE = {
         TopLeft: 1,
@@ -250,23 +255,26 @@ var robotFactory = function(robotFuncText){
         SQUARE.BottomCenter,
     ];
 
+    var robotMover = new Function('board', 'api', 'square', robotFuncText);
     self.move = function(board, api){
         return robotMover(board, api, SQUARE);
     }
+
+    self.code = robotFuncText;
     self.isRobot = true;
-    self.name = "Robot";
+    self.name = robotName || "Custom Robot";
 
     return self;
 }
 
-var simpleRobot = (
+var simpleRobot = robotFactory(
 `if (board.freeSquares.includes(square.Center)){
     return square.Center;
 }
 return api.getRandom(board.freeSquares);
-`);
+`, "Simple Robot");
 
-var mediumRobot = (
+var mediumRobot = robotFactory(
 `function determineWinningMoves(freeSquares, mySquares){
     var winningMoves = [];
     for (var i = 0; i < freeSquares.length; i++){
@@ -282,9 +290,9 @@ return (
     api.getRandom(determineWinningMoves(board.freeSquares, board.mySquares)) ||
     api.getRandom(determineWinningMoves(board.freeSquares, board.opponentSquares)) ||
     api.getRandom(board.freeSquares)
-);`);
+);`, "Medium Robot");
 
-var expertRobot = (
+var expertRobot = robotFactory(
 `function determineWinningMoves(freeSquares, mySquares){
     var winningMoves = [];
     for (var i = 0; i < freeSquares.length; i++){
@@ -322,7 +330,7 @@ return (
     api.getRandom(api.intersect(board.freeSquares, [square.Center])) ||
     api.getRandom(api.intersect(board.freeSquares, square.CORNERS)) ||
     api.getRandom(board.freeSquares)
-);`);
+);`, "Expert Robot");
 
 var codeDocs = (
 `// board gives you access to the current game state
@@ -371,49 +379,52 @@ var freeCorners = api.intersect(board.freeSquares, square.CORNERS);
 
 function ticTacToe(){
     var editorCode = ace.edit("editor-code");
-    editorCode.setValue(simpleRobot, -1);
     var editorStart = ace.edit("editor-start");
-    editorStart.setValue('function determineRobotMove(board, api, square) {', -1);
     var editorEnd = ace.edit("editor-end");
-    editorEnd.setValue('}', -1);
     var editorDocs = ace.edit("editor-docs");
-    editorDocs.setValue(codeDocs, -1);
     [editorStart, editorEnd, editorDocs].forEach(function (editor){
         editor.setReadOnly(true);
     });
     [editorCode, editorStart, editorEnd, editorDocs].forEach(function (editor){
         editor.setTheme("ace/theme/monokai");
         editor.getSession().setMode("ace/mode/javascript");
+        editor.$blockScrolling = Infinity;
     });
     [editorStart, editorEnd].forEach(function (editor){
         editor.getSession().setMode("ace/mode/text");
     });
+    editorStart.setValue('function determineRobotMove(board, api, square) {', -1);
+    editorEnd.setValue('}', -1);
+    editorDocs.setValue(codeDocs, -1);
 
     var game = boardFactory();
 
-    function loadRobot(){
-        var code = editorCode.getValue();
-        var robot = robotFactory(code);
+    function loadRobot(robot){
+        if (robot.code != editorCode.getValue()){
+            editorCode.setValue(robot.code, -1);
+        }
         if(parseInt($('#settings input[name=turn]:checked').val()) == 0){
             game.loadBrains(robot, humanBrain);
         } else {
             game.loadBrains(humanBrain, robot);
         }
     }
-    $('#run').click(loadRobot);
+    $('#run').click(function (){
+        var code = editorCode.getValue();
+        var robot = robotFactory(code);
+        loadRobot(robot);
+    });
     $('#load-simple').click(function(){
-        editorCode.setValue(simpleRobot, -1);
-        loadRobot();
+        loadRobot(simpleRobot);
     });
     $('#load-medium').click(function(){
-        editorCode.setValue(mediumRobot, -1);
-        loadRobot();
+        loadRobot(mediumRobot);
     });
     $('#load-expert').click(function(){
-        editorCode.setValue(expertRobot, -1);
-        loadRobot();
+        loadRobot(expertRobot);
     });
-    loadRobot();
+    loadRobot(simpleRobot);
+    // game.loadBrains(simpleRobot, expertRobot, 1);
 
     function exportGist(){
         var data = {
