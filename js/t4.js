@@ -282,32 +282,17 @@ function determinePincerMoves(freeSquares, mySquares){
     }
     return pincerMoves;
 }
-function determineSetupMoves(freeSquares, mySquares){
-    var setupMoves = [];
-    for (var i = 0; i < freeSquares.length; i++){
-        var hypoMove = freeSquares[i];
-        var hypoFreeSquares = (
-            freeSquares.slice(0, i).concat(freeSquares.slice(i+1))
-        );
-        var hypoMySquares = mySquares.concat(hypoMove);
-        if (determinePincerMoves(hypoFreeSquares, hypoMySquares).length >= 1){
-            setupMoves.push(hypoMove);
-        }
-    }
-    return setupMoves;
-}
 function checkFunc(determineFunc){
     return (
         api.getRandom(determineFunc(board.freeSquares, board.mySquares)) ||
         api.getRandom(determineFunc(board.freeSquares, board.opponentSquares))
     );
 }
-var firstMoves = square.CORNERS.concat(square.CENTER);
 return (
     checkFunc(determineWinningMoves) ||
     checkFunc(determinePincerMoves) ||
-    // checkFunc(determineSetupMoves) ||
-    api.getRandom(api.intersect(board.freeSquares, firstMoves)) ||
+    api.getRandom(api.intersect(board.freeSquares, [square.Center])) ||
+    api.getRandom(api.intersect(board.freeSquares, square.CORNERS)) ||
     api.getRandom(board.freeSquares)
 )`);
 
