@@ -1,5 +1,6 @@
 
-var gameBoard = (function () {
+var gameBoard = null;
+var boardFactory = function () {
     var self = {};
 
     var api = (function(){
@@ -222,7 +223,7 @@ var gameBoard = (function () {
         resetGame();
     };
     return self;
-})();
+};
 
 var humanBrain = {
     name: "Human",
@@ -381,16 +382,17 @@ var freeCorners = api.intersect(board.freeSquares, square.CORNERS);
 function simulate(brain1, brain2){
     var overallStats = [];
     var callbackFactory = function(p1, p2, callback){
+        var count = 100;
         var robotStats = {
+            total: count,
             win: 0,
             lose: 0,
             draw: 0,
         };
-        var count = 100;
         return function(robot, drawGame){
             if (drawGame){
                 robotStats.draw += 1;
-            } else if (robot.code == brain1.code) {
+            } else if (robot == brain1) {
                 robotStats.win += 1;
             } else {
                 robotStats.lose += 1;
@@ -399,23 +401,29 @@ function simulate(brain1, brain2){
             if (count > 0){
                 gameBoard.resetGame();
             } else {
-                console.log(robotStats);
                 overallStats.push(robotStats);
                 callback();
             }
         }
     }
+    var out = $('#sim-results');
+    out.html("calculating...");
     var printResults = function(){
-        console.log('done');
+        out.html(
+            "going 1st: " + JSON.stringify(overallStats[0]) +
+            "<br/>going 2nd: " + JSON.stringify(overallStats[1])
+        );
     }
     var secondRun = callbackFactory(brain2, brain1, printResults);
     var firstRun = callbackFactory(brain1, brain2, function(){
-        gameBoard.loadBrains(brain2, brain1, 1, secondRun);
+        gameBoard.loadBrains(brain2, brain1, 0, secondRun);
     });
-    gameBoard.loadBrains(brain1, brain2, 1, firstRun);
+    gameBoard.loadBrains(brain1, brain2, 0, firstRun);
 }
 
 function ticTacToe(){
+    gameBoard = boardFactory();
+
     var editorCode = ace.edit("editor-code");
     var editorStart = ace.edit("editor-start");
     var editorEnd = ace.edit("editor-end");
@@ -460,7 +468,6 @@ function ticTacToe(){
         loadRobot(expertRobot);
     });
     loadRobot(simpleRobot);
-    // game.loadBrains(simpleRobot, expertRobot, 1);
 
     $('#run-simulator').click(function(){
         var code = editorCode.getValue();
