@@ -60,13 +60,13 @@ var boardFactory = function () {
         'img/block_x.png',
         'img/block_o.png'
     ];
-    var playerId = null;  // either 0 or 1
+    var currentPlayerId = null;  // either 0 or 1
+    var playerBrains = null;  // list of len 2
     var emptyBlockPid = 2;
     var grid = {};
     var gameOver = null;
     var drawGame = null;
     var inputDisabled = true;
-    var robotBrain = null;
 
     function resetGrid() {
         grid = [];
@@ -77,7 +77,7 @@ var boardFactory = function () {
 
     function makeMove(clickedBlock) {
         if (grid[clickedBlock] == emptyBlockPid) {
-            grid[clickedBlock] = playerId;
+            grid[clickedBlock] = currentPlayerId;
             return true;
         }
         return false;
@@ -94,17 +94,21 @@ var boardFactory = function () {
     }
 
     function getOpponentId() {
-        return 1 - playerId;
+        return 1 - currentPlayerId;
+    }
+
+    function getCurrentPlayer() {
+        return playerBrains[currentPlayerId];
     }
 
     // view stuff
     function switchPlayer() {
-        playerId = getOpponentId();
+        currentPlayerId = getOpponentId();
         startTurn();
     }
 
     function resetGame() {
-        playerId = 0;
+        currentPlayerId = 0;
         gameOver = false;
         drawGame = false;
         inputDisabled = false;
@@ -118,7 +122,7 @@ var boardFactory = function () {
     }
 
     function endTurn() {
-        var blocks = getOwnedBlocks(playerId);
+        var blocks = getOwnedBlocks(currentPlayerId);
         var winningMove = api.checkForWin(blocks);
         if (winningMove) {
             winningMove.forEach(function(bid){
@@ -136,10 +140,7 @@ var boardFactory = function () {
     }
 
     function displayMessage(){
-        var playerName = "Human";
-        if (playerId == robotBrain.id){
-            playerName = "Robot";
-        }
+        var playerName = getCurrentPlayer().name;
         var message = playerName + "'s turn";
         if (drawGame){
             message = "Draw Game";
@@ -169,27 +170,28 @@ var boardFactory = function () {
     function makeDto(){
         var dto = {};
         dto.freeSquares = getOwnedBlocks(emptyBlockPid);
-        dto.mySquares = getOwnedBlocks(playerId);
+        dto.mySquares = getOwnedBlocks(currentPlayerId);
         dto.opponentSquares = getOwnedBlocks(getOpponentId());
         return dto;
     }
 
     function startTurn(){
-        if (playerId == robotBrain.id){
-            inputDisabled = true;
+        var cp = getCurrentPlayer();
+        if (cp.isRobot){
             setTimeout(function(){
-                takeTurn(robotBrain.move(makeDto(), api));
-                inputDisabled = false;
+                takeTurn(cp.move(makeDto(), api));
             }, 500);
         } else {
             // human turn: do nothing, wait for click event
+            inputDisabled = false;
         }
     }
 
     function takeTurn(blockId){
         var success = makeMove(blockId);
         if (success) {
-            markBlock(blockId, playerId);
+            markBlock(blockId, currentPlayerId);
+            inputDisabled = true;
             endTurn();
         }
     }
@@ -205,11 +207,18 @@ var boardFactory = function () {
         }
     });
 
-    self.loadRobot = function(brain){
-        robotBrain = brain;
+    self.loadBrains = function(brain1, brain2){
+        brain1 = brain1 || humanBrain;
+        brain2 = brain2 || humanBrain;
+        playerBrains = [brain1, brain2];
         resetGame();
     };
     return self;
+};
+
+var humanBrain = {
+    name: "Human",
+    isRobot: false,
 };
 
 var robotFactory = function(robotFuncText){
@@ -244,7 +253,8 @@ var robotFactory = function(robotFuncText){
     self.move = function(board, api){
         return robotMover(board, api, SQUARE);
     }
-    self.id = parseInt($('#settings input[name=turn]:checked').val());
+    self.isRobot = true;
+    self.name = "Robot";
 
     return self;
 }
@@ -384,7 +394,11 @@ function ticTacToe(){
     function loadRobot(){
         var code = editorCode.getValue();
         var robot = robotFactory(code);
-        game.loadRobot(robot);
+        if(parseInt($('#settings input[name=turn]:checked').val()) == 0){
+            game.loadBrains(robot, humanBrain);
+        } else {
+            game.loadBrains(humanBrain, robot);
+        }
     }
     $('#run').click(loadRobot);
     $('#load-simple').click(function(){
