@@ -1,5 +1,5 @@
 
-var boardFactory = function () {
+var gameBoard = (function () {
     var self = {};
 
     var api = (function(){
@@ -212,16 +212,17 @@ var boardFactory = function () {
         }
     });
 
+    self.resetGame = resetGame;
     self.loadBrains = function(brain1, brain2, timeout, callback){
         brain1 = brain1 || humanBrain;
         brain2 = brain2 || humanBrain;
         playerBrains = [brain1, brain2];
-        robotTimeout = timeout || 500;
+        robotTimeout = timeout == null ? 500 : timeout;
         gameOverCallback = callback;
         resetGame();
     };
     return self;
-};
+})();
 
 var humanBrain = {
     name: "Human",
@@ -377,6 +378,43 @@ api.intersect(squares1, squares2);
 var freeCorners = api.intersect(board.freeSquares, square.CORNERS);
 `);
 
+function simulate(brain1, brain2){
+    var overallStats = [];
+    var callbackFactory = function(p1, p2, callback){
+        var robotStats = {
+            win: 0,
+            lose: 0,
+            draw: 0,
+        };
+        var count = 100;
+        return function(robot, drawGame){
+            if (drawGame){
+                robotStats.draw += 1;
+            } else if (robot.code == brain1.code) {
+                robotStats.win += 1;
+            } else {
+                robotStats.lose += 1;
+            }
+            count -= 1;
+            if (count > 0){
+                gameBoard.resetGame();
+            } else {
+                console.log(robotStats);
+                overallStats.push(robotStats);
+                callback();
+            }
+        }
+    }
+    var printResults = function(){
+        console.log('done');
+    }
+    var secondRun = callbackFactory(brain2, brain1, printResults);
+    var firstRun = callbackFactory(brain1, brain2, function(){
+        gameBoard.loadBrains(brain2, brain1, 1, secondRun);
+    });
+    gameBoard.loadBrains(brain1, brain2, 1, firstRun);
+}
+
 function ticTacToe(){
     var editorCode = ace.edit("editor-code");
     var editorStart = ace.edit("editor-start");
@@ -397,16 +435,14 @@ function ticTacToe(){
     editorEnd.setValue('}', -1);
     editorDocs.setValue(codeDocs, -1);
 
-    var game = boardFactory();
-
     function loadRobot(robot){
         if (robot.code != editorCode.getValue()){
             editorCode.setValue(robot.code, -1);
         }
         if(parseInt($('#settings input[name=turn]:checked').val()) == 0){
-            game.loadBrains(robot, humanBrain);
+            gameBoard.loadBrains(robot, humanBrain);
         } else {
-            game.loadBrains(humanBrain, robot);
+            gameBoard.loadBrains(humanBrain, robot);
         }
     }
     $('#run').click(function (){
@@ -425,6 +461,12 @@ function ticTacToe(){
     });
     loadRobot(simpleRobot);
     // game.loadBrains(simpleRobot, expertRobot, 1);
+
+    $('#run-simulator').click(function(){
+        var code = editorCode.getValue();
+        var robot = robotFactory(code);
+        simulate(robot, expertRobot);
+    });
 
     function exportGist(){
         var data = {
