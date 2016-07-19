@@ -256,6 +256,24 @@ var simpleRobot = (
 return api.getRandom(board.freeSquares);
 `);
 
+var mediumRobot = (
+`function determineWinningMoves(freeSquares, mySquares){
+    var winningMoves = [];
+    for (var i = 0; i < freeSquares.length; i++){
+        var hypoMove = freeSquares[i];
+        var hypoSquares = mySquares.concat(hypoMove);
+        if (api.checkForWin(hypoSquares)){
+            winningMoves.push(hypoMove);
+        }
+    }
+    return winningMoves;
+}
+return (
+    api.getRandom(determineWinningMoves(board.freeSquares, board.mySquares)) ||
+    api.getRandom(determineWinningMoves(board.freeSquares, board.opponentSquares)) ||
+    api.getRandom(board.freeSquares)
+);`);
+
 var expertRobot = (
 `function determineWinningMoves(freeSquares, mySquares){
     var winningMoves = [];
@@ -294,7 +312,7 @@ return (
     api.getRandom(api.intersect(board.freeSquares, [square.Center])) ||
     api.getRandom(api.intersect(board.freeSquares, square.CORNERS)) ||
     api.getRandom(board.freeSquares)
-)`);
+);`);
 
 var codeDocs = (
 `// board gives you access to the current game state
@@ -371,6 +389,10 @@ function ticTacToe(){
     $('#run').click(loadRobot);
     $('#load-simple').click(function(){
         editorCode.setValue(simpleRobot, -1);
+        loadRobot();
+    });
+    $('#load-medium').click(function(){
+        editorCode.setValue(mediumRobot, -1);
         loadRobot();
     });
     $('#load-expert').click(function(){

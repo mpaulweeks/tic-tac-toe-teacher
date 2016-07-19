@@ -25,9 +25,8 @@
 <p>work in progress</p>
 
 <div class="col-md-5">
-
   <div class="tab-content">
-    <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+    <ul id="tabs-left" class="nav nav-tabs" data-tabs="tabs">
         <li class="active"><a href="#board" data-toggle="tab">Game Board</a></li>
         <li><a href="#docs" data-toggle="tab">Code Reference</a></li>
     </ul>
@@ -65,20 +64,31 @@
   </div>
 </div>
 <div class="col-md-7">
-    <span>
-        <form id="settings">
-            Robot plays:
-            <input type="radio" name="turn" value="0" checked> First (X)
-            <input type="radio" name="turn" value="1"> Second (O)
-        </form>
-    </span>
-    <button id="run">Run</button>
-    <button id="load-simple">Load Simple Robot</button>
-    <button id="load-expert">Load Expert Robot</button>
-    <!-- <button id="export-gist">Export Gist</button> -->
-    <div class="code snippet" id="editor-start"></div>
-    <div class="code" id="editor-code"></div>
-    <div class="code snippet" id="editor-end"></div>
+  <div class="tab-content">
+    <ul id="tabs-right" class="nav nav-tabs" data-tabs="tabs">
+        <li class="active"><a href="#editor" data-toggle="tab">Code</a></li>
+        <li><a href="#sim" data-toggle="tab">Simulator</a></li>
+    </ul>
+    <div role="tabpanel" class="tab-pane active" id="editor">
+        <span>
+            <form id="settings">
+                Robot plays:
+                <input type="radio" name="turn" value="0" checked> First (X)
+                <input type="radio" name="turn" value="1"> Second (O)
+            </form>
+        </span>
+        <button id="run">Run</button>
+        <button id="load-simple">Load Simple Robot</button>
+        <button id="load-medium">Load Medium Robot</button>
+        <button id="load-expert">Load Expert Robot</button>
+        <!-- <button id="export-gist">Export Gist</button> -->
+        <div class="code snippet" id="editor-start"></div>
+        <div class="code" id="editor-code"></div>
+        <div class="code snippet" id="editor-end"></div>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="sim">
+        Simulate!
+    </div>
 </div>
 
 </div>
