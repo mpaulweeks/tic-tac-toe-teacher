@@ -35,6 +35,7 @@ var robotFactory = function(robotFuncText, robotName){
     self.code = robotFuncText;
     self.isRobot = true;
     self.name = robotName || "Custom Robot";
+    self.id = self.name.toLowerCase().replace(" ", "-");
     if (robotName){
         presetRobots.push(self);
     }

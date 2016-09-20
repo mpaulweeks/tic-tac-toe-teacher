@@ -52,6 +52,13 @@ function ticTacToe(){
 
     $('#pre-code').html('function determineRobotMove(board, api, square) {');
     $('#post-code').html('}');
+    presetRobots.forEach(function (r){
+        var html = '<button id="load-' + r.id + '">Load ' + r.name + '</button><br/><br/>';
+        $('#preset').append(html);
+        $('#load-' + r.id).click(function(){
+            checkLoadPreset(r);
+        });
+    })
 
     var editorCode = ace.edit("editor-code");
     var editorDocs = ace.edit("editor-docs");
@@ -95,15 +102,6 @@ function ticTacToe(){
         saveCodeBrowser(code);
         var robot = robotFactory(code);
         loadRobot(robot);
-    });
-    $('#load-simple').click(function(){
-        checkLoadPreset(simpleRobot);
-    });
-    $('#load-medium').click(function(){
-        checkLoadPreset(mediumRobot);
-    });
-    $('#load-expert').click(function(){
-        checkLoadPreset(expertRobot);
     });
 
     // init
