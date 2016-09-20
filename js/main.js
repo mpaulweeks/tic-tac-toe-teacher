@@ -1,12 +1,25 @@
 
 function ticTacToe(){
 
-    function saveCodeCookie(code){
-        Cookie.createCookie('t4-code', code, 7);
+    var cookieKey = "t4-code";
+    function saveCodeBrowser(code){
+        try {
+            if (localStorage) {
+                localStorage.setItem(cookieKey, code);
+            } else {
+                Cookie.createCookie(cookieKey, code, 7);
+            }
+        }
+        catch (err) {
+            alert(err.Description);
+        }
     }
 
-    function loadCodeCookie(){
-        return Cookie.readCookie('t4-code');
+    function loadCodeBrowser(){
+        if (localStorage) {
+            return localStorage.getItem(cookieKey);
+        }
+        return Cookie.readCookie(cookieKey);
     }
 
     function exportGist(code){
@@ -64,7 +77,7 @@ function ticTacToe(){
     }
     $('#save-reload').click(function (){
         var code = editorCode.getValue();
-        saveCodeCookie(code);
+        saveCodeBrowser(code);
         var robot = robotFactory(code);
         loadRobot(robot);
     });
@@ -79,7 +92,7 @@ function ticTacToe(){
     });
 
     // init
-    var cookieCode = loadCodeCookie();
+    var cookieCode = loadCodeBrowser();
     if (cookieCode){
         var robot = robotFactory(cookieCode);
         loadRobot(robot);
