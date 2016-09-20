@@ -1,4 +1,5 @@
 
+var presetRobots = [];
 var robotFactory = function(robotFuncText, robotName){
     var self = {};
 
@@ -34,19 +35,23 @@ var robotFactory = function(robotFuncText, robotName){
     self.code = robotFuncText;
     self.isRobot = true;
     self.name = robotName || "Custom Robot";
-
+    if (robotName){
+        presetRobots.push(self);
+    }
     return self;
 }
 
 var simpleRobot = robotFactory(
-`if (board.freeSquares.includes(square.Center)){
+`
+if (board.freeSquares.includes(square.Center)){
     return square.Center;
 }
 return api.getRandom(board.freeSquares);
 `, "Simple Robot");
 
 var mediumRobot = robotFactory(
-`function determineWinningMoves(freeSquares, mySquares){
+`
+function determineWinningMoves(freeSquares, mySquares){
     var winningMoves = [];
     for (var i = 0; i < freeSquares.length; i++){
         var hypoMove = freeSquares[i];
@@ -61,10 +66,12 @@ return (
     api.getRandom(determineWinningMoves(board.freeSquares, board.mySquares)) ||
     api.getRandom(determineWinningMoves(board.freeSquares, board.opponentSquares)) ||
     api.getRandom(board.freeSquares)
-);`, "Medium Robot");
+);
+`, "Medium Robot");
 
 var expertRobot = robotFactory(
-`function determineWinningMoves(freeSquares, mySquares){
+`
+function determineWinningMoves(freeSquares, mySquares){
     var winningMoves = [];
     for (var i = 0; i < freeSquares.length; i++){
         var hypoMove = freeSquares[i];
@@ -101,4 +108,5 @@ return (
     api.getRandom(api.intersect(board.freeSquares, [square.Center])) ||
     api.getRandom(api.intersect(board.freeSquares, square.CORNERS)) ||
     api.getRandom(board.freeSquares)
-);`, "Expert Robot");
+);
+`, "Expert Robot");

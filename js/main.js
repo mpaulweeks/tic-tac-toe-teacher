@@ -75,6 +75,21 @@ function ticTacToe(){
             gameBoard.loadBrains(humanBrain, robot);
         }
     }
+    function checkLoadPreset(robot){
+        var found = false;
+        var currentCode = editorCode.getValue();
+        presetRobots.forEach(function (r){
+            found = found || r.code == currentCode;
+        });
+        var ok = true;
+        if (!found){
+            ok = confirm("This will discard your current code. Continue?");
+        }
+        if (ok){
+            loadRobot(robot);
+        }
+    }
+
     $('#save-reload').click(function (){
         var code = editorCode.getValue();
         saveCodeBrowser(code);
@@ -82,13 +97,13 @@ function ticTacToe(){
         loadRobot(robot);
     });
     $('#load-simple').click(function(){
-        loadRobot(simpleRobot);
+        checkLoadPreset(simpleRobot);
     });
     $('#load-medium').click(function(){
-        loadRobot(mediumRobot);
+        checkLoadPreset(mediumRobot);
     });
     $('#load-expert').click(function(){
-        loadRobot(expertRobot);
+        checkLoadPreset(expertRobot);
     });
 
     // init
