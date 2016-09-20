@@ -1,5 +1,6 @@
 
 function simulate(brain1, brain2){
+    var simBoard = boardFactory();
     var overallStats = [];
     var callbackFactory = function(p1, p2, callback){
         var count = 100;
@@ -19,7 +20,7 @@ function simulate(brain1, brain2){
             }
             count -= 1;
             if (count > 0){
-                gameBoard.resetGame();
+                simBoard.resetGame();
             } else {
                 overallStats.push(robotStats);
                 callback();
@@ -36,7 +37,7 @@ function simulate(brain1, brain2){
     }
     var secondRun = callbackFactory(brain2, brain1, printResults);
     var firstRun = callbackFactory(brain1, brain2, function(){
-        gameBoard.loadBrains(brain2, brain1, 0, secondRun);
+        simBoard.loadBrains(brain2, brain1, 0, secondRun);
     });
-    gameBoard.loadBrains(brain1, brain2, 0, firstRun);
+    simBoard.loadBrains(brain1, brain2, 0, firstRun);
 }

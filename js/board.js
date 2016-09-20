@@ -3,6 +3,8 @@ var gameBoard = null;
 var boardFactory = function (humanBrain) {
     var self = {};
 
+    var isSimulation = !Boolean(humanBrain);
+
     var api = (function(){
         var self = {};
         var winningBlocks = [
@@ -118,7 +120,9 @@ var boardFactory = function (humanBrain) {
         resetGrid();
         for(var bid = 0; bid < grid.length; bid++){
             markBlock(bid, emptyBlockPid);
-            $('#block-'+bid).removeClass('highlight');
+            if (!isSimulation){
+                $('#block-'+bid).removeClass('highlight');
+            }
         }
         displayMessage();
         startTurn();
@@ -128,9 +132,11 @@ var boardFactory = function (humanBrain) {
         var blocks = getOwnedBlocks(currentPlayerId);
         var winningMove = api.checkForWin(blocks);
         if (winningMove) {
-            winningMove.forEach(function(bid){
-                $('#block-'+bid).addClass('highlight');
-            });
+            if (!isSimulation){
+                winningMove.forEach(function(bid){
+                    $('#block-'+bid).addClass('highlight');
+                });
+            }
             gameOver = true;
         }
         else if (getOwnedBlocks(emptyBlockPid).length == 0){
@@ -146,14 +152,16 @@ var boardFactory = function (humanBrain) {
     }
 
     function displayMessage(){
-        var playerName = getCurrentPlayer().name;
-        var message = playerName + "'s turn";
-        if (drawGame){
-            message = "Draw Game";
-        } else if (gameOver) {
-            message = playerName + " wins!";
+        if (!isSimulation){
+            var playerName = getCurrentPlayer().name;
+            var message = playerName + "'s turn";
+            if (drawGame){
+                message = "Draw Game";
+            } else if (gameOver) {
+                message = playerName + " wins!";
+            }
+            $('#message').html(message);
         }
-        $('#message').html(message);
     }
 
     function displayImage(elm, pid) {
@@ -162,14 +170,16 @@ var boardFactory = function (humanBrain) {
     }
 
     function markBlock(blockId, pid) {
-        var block = $('#block-'+blockId);
-        if(pid === emptyBlockPid){
-            block.empty();
-            block.removeClass('filled');
-        }
-        else{
-            displayImage(block, pid);
-            block.addClass('filled');
+        if (!isSimulation){
+            var block = $('#block-'+blockId);
+            if(pid === emptyBlockPid){
+                block.empty();
+                block.removeClass('filled');
+            }
+            else{
+                displayImage(block, pid);
+                block.addClass('filled');
+            }
         }
     }
 
@@ -202,16 +212,18 @@ var boardFactory = function (humanBrain) {
         }
     }
 
-    $('#reset').on('click', resetGame);
-    $('.block').on('click', function () {
-        if(gameOver || inputDisabled){
-            // do nothing, wait for manual reset
-        }
-        else{
-            var blockId = $(this).data('id');
-            takeTurn(blockId);
-        }
-    });
+    if (!isSimulation){
+        $('#reset').on('click', resetGame);
+        $('.block').on('click', function () {
+            if(gameOver || inputDisabled){
+                // do nothing, wait for manual reset
+            }
+            else{
+                var blockId = $(this).data('id');
+                takeTurn(blockId);
+            }
+        });
+    }
 
     self.resetGame = resetGame;
     self.loadBrains = function(brain1, brain2, timeout, callback){
