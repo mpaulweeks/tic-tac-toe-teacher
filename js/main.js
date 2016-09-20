@@ -1,10 +1,40 @@
 
 function ticTacToe(){
+
+    function saveCodeCookie(code){
+        Cookie.createCookie('t4-code', code, 7);
+    }
+
+    function loadCodeCookie(){
+        return Cookie.readCookie('t4-code');
+    }
+
+    function exportGist(code){
+        var data = {
+            "description": "posting gist test",
+            "public": false,
+            "files": {
+                "test.txt": {
+                    "content": code,
+                }
+            }
+        };
+        $.ajax({
+            url: 'https://api.github.com/gists',
+            type: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(data)
+        }).success( function(e) {
+            console.log(e);
+        }).error( function(e) {
+            console.warn("gist save error", e);
+        });
+    }
+
     var humanBrain = {
         name: "Human",
         isRobot: false,
     };
-
     gameBoard = boardFactory(humanBrain);
 
     $('#pre-code').html('function determineRobotMove(board, api, square) {');
@@ -32,8 +62,9 @@ function ticTacToe(){
             gameBoard.loadBrains(humanBrain, robot);
         }
     }
-    $('#run').click(function (){
+    $('#save-reload').click(function (){
         var code = editorCode.getValue();
+        saveCodeCookie(code);
         var robot = robotFactory(code);
         loadRobot(robot);
     });
@@ -46,34 +77,22 @@ function ticTacToe(){
     $('#load-expert').click(function(){
         loadRobot(expertRobot);
     });
-    loadRobot(simpleRobot);
+
+    // init
+    var cookieCode = loadCodeCookie();
+    if (cookieCode){
+        var robot = robotFactory(cookieCode);
+        loadRobot(robot);
+    } else {
+        loadRobot(simpleRobot);
+    }
 
     $('#run-simulator').click(function(){
         var code = editorCode.getValue();
         var robot = robotFactory(code);
         simulate(robot, expertRobot);
     });
-
-    function exportGist(){
-        var data = {
-            "description": "posting gist test",
-            "public": false,
-            "files": {
-                "test.txt": {
-                    "content": editorCode.getValue(),
-                }
-            }
-        };
-        $.ajax({
-            url: 'https://api.github.com/gists',
-            type: 'POST',
-            dataType: 'json',
-            data: JSON.stringify(data)
-        }).success( function(e) {
-            console.log(e);
-        }).error( function(e) {
-            console.warn("gist save error", e);
-        });
-    }
-    $('#export-gist').click(exportGist);
+    $('#export-gist').click(function (){
+        exportGist(editorCode.getValue())
+    });
 }

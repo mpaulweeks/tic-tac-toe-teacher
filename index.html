@@ -13,6 +13,7 @@
         <script src="js/jquery-1-9-1.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/cookie.js"></script>
         <script src="js/board.js"></script>
         <script src="js/robot.js"></script>
         <script src="js/sim.js"></script>
@@ -32,6 +33,8 @@
   <div class="tab-content">
     <ul id="tabs-left" class="nav nav-tabs" data-tabs="tabs">
         <li class="active"><a href="#board" data-toggle="tab">Game Board</a></li>
+        <li><a href="#sim" data-toggle="tab">Simulator</a></li>
+        <li><a href="#preset" data-toggle="tab">Presets</a></li>
         <li><a href="#docs" data-toggle="tab">Code Reference</a></li>
     </ul>
     <div role="tabpanel" class="tab-pane active" id="board">
@@ -57,38 +60,17 @@
             <div id="block-9" data-id="9" class="block"></div>
             <div class="float-clear"></div>
         </div>
-        <br/>
-        <button id="reset">
-            RESET
-        </button>
-    </div>
-    <div role="tabpanel" class="tab-pane" id="docs">
-        <div class="code" id="editor-docs"></div>
-    </div>
-  </div>
-</div>
-<div class="col-md-7">
-  <div class="tab-content">
-    <ul id="tabs-right" class="nav nav-tabs" data-tabs="tabs">
-        <li class="active"><a href="#editor" data-toggle="tab">Code</a></li>
-        <li><a href="#sim" data-toggle="tab">Simulator</a></li>
-    </ul>
-    <div role="tabpanel" class="tab-pane active" id="editor">
-        <span>
+        <div>
+            <br/>
+            <button id="reset">Reset Game</button>
+            <button id="save-reload">Save and Reload Code</button>
+            <br/>
+            <br/>
             <form id="settings">
-                Robot plays:
-                <input type="radio" name="turn" value="0" checked> First (X)
-                <input type="radio" name="turn" value="1"> Second (O)
+                <input type="radio" name="turn" value="0" checked> Robot plays first<br/>
+                <input type="radio" name="turn" value="1"> Robot plays second
             </form>
-        </span>
-        <button id="run">Run</button>
-        <button id="load-simple">Load Simple Robot</button>
-        <button id="load-medium">Load Medium Robot</button>
-        <button id="load-expert">Load Expert Robot</button>
-        <!-- <button id="export-gist">Export Gist</button> -->
-        <div class="code-bookend" id="pre-code"></div>
-        <div class="code" id="editor-code"></div>
-        <div class="code-bookend" id="post-code"></div>
+        </div>
     </div>
     <div role="tabpanel" class="tab-pane" id="sim">
         <h3> Simulate! </h3>
@@ -96,6 +78,22 @@
         <br/>
         <div id="sim-results"></div>
     </div>
+    <div role="tabpanel" class="tab-pane" id="preset">
+        <h3> Presets </h3><br/>
+        <button id="load-simple">Load Example Robot</button><br/><br/>
+        <button id="load-medium">Load Simple Robot</button><br/><br/>
+        <button id="load-expert">Load Expert Robot</button><br/><br/>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="docs">
+        <div class="code" id="editor-docs"></div>
+    </div>
+  </div>
+</div>
+<div class="col-md-7">
+    <!-- <button id="export-gist">Export Gist</button> -->
+    <div class="code-bookend" id="pre-code"></div>
+    <div class="code" id="editor-code"></div>
+    <div class="code-bookend" id="post-code"></div>
 </div>
 
 </div>
