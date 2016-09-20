@@ -34,12 +34,18 @@ body {
     height: 600px;
     width: 100%;
     margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .code#editor-code {
     height: 551px;
 }
 
-.code.snippet {
+.code-bookend {
+    padding-left: 20px;
     height: 18px;
+    background-color: #272822;
+    color: #F8F8F2;
+    text-align: left;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }

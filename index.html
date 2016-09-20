@@ -13,7 +13,11 @@
         <script src="js/jquery-1-9-1.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script src="js/t4.js"></script>
+        <script src="js/board.js"></script>
+        <script src="js/robot.js"></script>
+        <script src="js/sim.js"></script>
+        <script src="js/constant.js"></script>
+        <script src="js/main.js"></script>
     </head>
 
 <body>
@@ -82,9 +86,9 @@
         <button id="load-medium">Load Medium Robot</button>
         <button id="load-expert">Load Expert Robot</button>
         <!-- <button id="export-gist">Export Gist</button> -->
-        <div class="code snippet" id="editor-start"></div>
+        <div class="code-bookend" id="pre-code"></div>
         <div class="code" id="editor-code"></div>
-        <div class="code snippet" id="editor-end"></div>
+        <div class="code-bookend" id="post-code"></div>
     </div>
     <div role="tabpanel" class="tab-pane" id="sim">
         <h3> Simulate! </h3>
