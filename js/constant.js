@@ -1,11 +1,17 @@
 
+
 var codeDocs = (
-`// board gives you access to the current game state
-board.freeSquares;
+`
+////////////////////
+// board & square //
+////////////////////
+
+// board gives you access to the current game state
+board.freeSquares;  // list of square ids
 board.mySquares;
 board.opponentSquares;
 
-// square gives you ids of all 9 squares
+// square gives you the ids of all 9 squares
 square.TopLeft;
 square.TopCenter;
 square.TopRight;
@@ -16,30 +22,49 @@ square.BottomLeft;
 square.BottomCenter;
 square.BottomRight;
 
-// example
+// example usage
 if (board.freeSquares.includes(square.Center)){
     return square.Center;
 }
 
-// square also has lists of the corners and SIDES
+// for convenience, square also has:
 square.CORNERS;
 square.SIDES;
 
-// api has a number of helper functions
 
-api.checkForWin(squares);
-// Takes in a list of squares
+/////////
+// api //
+/////////
+
+// api provides a couple of helper functions
+
+
+// Takes in a list of square ids
 // Returns true/false is they contain a three-in-a-row
+api.checkForWin(squares);
 
-api.getRandom(squares);
-// Takes in a list of squares
+// example usage
+var nextTurn = board.mySquares.concat(square.BottomRight);
+if (api.checkForWin(nextTurn)){
+    return square.BottomRight;
+}
+
+
+// Takes in a list of square ids
 // Returns one at random
 // Returns null if list is empty
+api.getRandom(squares);
 
-api.intersect(squares1, squares2);
-// Takes in two lists of squares
+// Takes in two lists of square ids
 // Returns a new list containing the squares present in both lists
+api.intersect(squares1, squares2);
 
-// example
+// example usage
 var freeCorners = api.intersect(board.freeSquares, square.CORNERS);
+var cornerMove = api.getRandom(freeCorners);
+if (cornerMove != null){
+    return cornerMove;
+} else {
+    // do something else
+}
 `);

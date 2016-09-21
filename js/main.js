@@ -66,6 +66,8 @@ function ticTacToe(){
     var editorDocs = ace.edit("editor-docs");
     [editorDocs].forEach(function (editor){
         editor.setReadOnly(true);
+        editor.renderer.setShowGutter(false);
+        // editor.renderer.setOption('showLineNumbers', false);
     });
     [editorCode, editorDocs].forEach(function (editor){
         editor.setTheme("ace/theme/monokai");
