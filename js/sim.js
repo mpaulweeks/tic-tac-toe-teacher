@@ -1,5 +1,5 @@
 
-function simulate(brain1, brain2){
+function simulate(brain1, brain2, callback){
     var simBoard = boardFactory();
 
     var simOneGame = function(){
@@ -83,9 +83,13 @@ function simulate(brain1, brain2){
         printResults(overallStats);
         if (overallStats[0].total < 1000){
             setTimeout(function (){
-                calcStats(count * 2);
+                calcStats(count + 100);
             }, 0);
+        } else {
+            callback();
         }
     }
-    calcStats(100);
+    setTimeout(function(){
+        calcStats(100);
+    }, 0);
 }

@@ -53,11 +53,13 @@ function ticTacToe(){
     $('#pre-code').html('function determineRobotMove(board, api, square) {');
     $('#post-code').html('}');
     presetRobots.forEach(function (r){
-        var html = '<button id="load-' + r.id + '">Load ' + r.name + '</button><br/><br/>';
-        $('#preset').append(html);
-        $('#load-' + r.id).click(function(){
-            checkLoadPreset(r);
-        });
+        if (r.isVisible){
+            var html = '<button id="load-' + r.id + '">Load ' + r.name + '</button><br/><br/>';
+            $('#preset').append(html);
+            $('#load-' + r.id).click(function(){
+                checkLoadPreset(r);
+            });
+        }
     })
 
     var editorCode = ace.edit("editor-code");
@@ -82,7 +84,9 @@ function ticTacToe(){
         var found = false;
         var currentCode = editorCode.getValue();
         presetRobots.forEach(function (r){
-            found = found || r.code == currentCode;
+            if (r.isVisible){
+                found = found || r.code == currentCode;
+            }
         });
         var ok = true;
         if (!found){
@@ -99,6 +103,29 @@ function ticTacToe(){
         var robot = robotFactory(code);
         loadRobot(robot);
     });
+    $('#sim-thinking').hide();
+    $('#run-simulator').click(function(){
+        $('#sim-ready').hide();
+        $('#sim-thinking').show();
+        $('#sim-results').empty();
+        var count = presetRobots.length;
+        var callback = function(){
+            count -= 1;
+            if (count <= 0){
+                $('#sim-ready').show();
+                $('#sim-thinking').hide();
+            }
+        };
+        var code = editorCode.getValue();
+        saveCodeBrowser(code);
+        var robot = robotFactory(code);
+        presetRobots.forEach(function (pr){
+            simulate(robot, pr, callback);
+        });
+    });
+    $('#export-gist').click(function (){
+        exportGist(editorCode.getValue())
+    });
 
     // init
     var cookieCode = loadCodeBrowser();
@@ -108,16 +135,4 @@ function ticTacToe(){
     } else {
         loadRobot(simpleRobot);
     }
-
-    $('#run-simulator').click(function(){
-        var code = editorCode.getValue();
-        var robot = robotFactory(code);
-        $('#sim-results').empty();
-        presetRobots.forEach(function (pr){
-            simulate(robot, pr);
-        });
-    });
-    $('#export-gist').click(function (){
-        exportGist(editorCode.getValue())
-    });
 }

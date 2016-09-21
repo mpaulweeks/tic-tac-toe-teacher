@@ -1,6 +1,6 @@
 
 var presetRobots = [];
-var robotFactory = function(robotFuncText, robotName){
+var robotFactory = function(robotFuncText, robotName, isVisible){
     var self = {};
 
     var SQUARE = {
@@ -39,6 +39,7 @@ var robotFactory = function(robotFuncText, robotName){
     if (robotName){
         presetRobots.push(self);
     }
+    self.isVisible = isVisible || false;
     return self;
 }
 
@@ -48,7 +49,7 @@ if (board.freeSquares.includes(square.Center)){
     return square.Center;
 }
 return api.getRandom(board.freeSquares);
-`, "Simple Robot");
+`, "Simple Robot", true);
 
 var mediumRobot = robotFactory(
 `
@@ -68,7 +69,7 @@ return (
     api.getRandom(determineWinningMoves(board.freeSquares, board.opponentSquares)) ||
     api.getRandom(board.freeSquares)
 );
-`, "Medium Robot");
+`, "Medium Robot", true);
 
 var expertRobot = robotFactory(
 `
@@ -110,4 +111,4 @@ return (
     api.getRandom(api.intersect(board.freeSquares, square.CORNERS)) ||
     api.getRandom(board.freeSquares)
 );
-`, "Expert Robot");
+`, "Expert Robot", false);
