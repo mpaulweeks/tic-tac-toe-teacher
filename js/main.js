@@ -76,11 +76,7 @@ function ticTacToe(){
         if (robot.code != editorCode.getValue()){
             editorCode.setValue(robot.code, -1);
         }
-        if(parseInt($('#settings input[name=turn]:checked').val()) == 0){
-            gameBoard.loadBrains(robot, humanBrain);
-        } else {
-            gameBoard.loadBrains(humanBrain, robot);
-        }
+        gameBoard.loadBrains(humanBrain, robot);
     }
     function checkLoadPreset(robot){
         var found = false;
@@ -116,7 +112,10 @@ function ticTacToe(){
     $('#run-simulator').click(function(){
         var code = editorCode.getValue();
         var robot = robotFactory(code);
-        simulate(robot, expertRobot);
+        $('#sim-results').empty();
+        presetRobots.forEach(function (pr){
+            simulate(robot, pr);
+        });
     });
     $('#export-gist').click(function (){
         exportGist(editorCode.getValue())

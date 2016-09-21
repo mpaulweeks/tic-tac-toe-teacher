@@ -3,8 +3,6 @@ var gameBoard = null;
 var boardFactory = function (humanBrain) {
     var self = {};
 
-    var isSimulation = !Boolean(humanBrain);
-
     var api = (function(){
         var self = {};
         var winningBlocks = [
@@ -63,12 +61,12 @@ var boardFactory = function (humanBrain) {
         'img/block_x.png',
         'img/block_o.png'
     ];
+    var robotTimeout = 500;
+    var emptyBlockPid = 2;
+    var isSimulation = !Boolean(humanBrain);
+    var grid = {};
     var currentPlayerId = null;  // either 0 or 1
     var playerBrains = null;  // list of len 2
-    var robotTimeout = null;
-    var gameOverCallback = null;
-    var emptyBlockPid = 2;
-    var grid = {};
     var gameOver = null;
     var drawGame = null;
     var inputDisabled = true;
@@ -106,14 +104,18 @@ var boardFactory = function (humanBrain) {
         return playerBrains[currentPlayerId];
     }
 
-    // view stuff
     function switchPlayer() {
         currentPlayerId = getOpponentId();
-        startTurn();
     }
 
     function resetGame() {
         currentPlayerId = 0;
+        if (!isSimulation){
+            var reversed = parseInt($('#settings input[name=turn]:checked').val()) == 0;
+            if (reversed){
+                currentPlayerId = 1;
+            }
+        }
         gameOver = false;
         drawGame = false;
         inputDisabled = false;
@@ -125,29 +127,8 @@ var boardFactory = function (humanBrain) {
             }
         }
         displayMessage();
-        startTurn();
-    }
-
-    function endTurn() {
-        var blocks = getOwnedBlocks(currentPlayerId);
-        var winningMove = api.checkForWin(blocks);
-        if (winningMove) {
-            if (!isSimulation){
-                winningMove.forEach(function(bid){
-                    $('#block-'+bid).addClass('highlight');
-                });
-            }
-            gameOver = true;
-        }
-        else if (getOwnedBlocks(emptyBlockPid).length == 0){
-            gameOver = true;
-            drawGame = true;
-        } else {
-            switchPlayer();
-        }
-        displayMessage();
-        if (gameOver && gameOverCallback){
-            gameOverCallback(getCurrentPlayer(), drawGame);
+        if (getCurrentPlayer().isRobot){
+            endHumanTurn();
         }
     }
 
@@ -191,15 +172,19 @@ var boardFactory = function (humanBrain) {
         return dto;
     }
 
-    function startTurn(){
+    function endHumanTurn(){
+        setTimeout(function (){
+            startRobotTurn();
+            inputDisabled = false;
+        }, robotTimeout);
+    }
+
+    function startRobotTurn(){
         var cp = getCurrentPlayer();
         if (cp.isRobot){
-            setTimeout(function(){
-                takeTurn(cp.move(makeDto(), api));
-            }, robotTimeout);
+            takeTurn(cp.move(makeDto(), api));
         } else {
-            // human turn: do nothing, wait for click event
-            inputDisabled = false;
+            throw "not a robot";
         }
     }
 
@@ -212,6 +197,26 @@ var boardFactory = function (humanBrain) {
         }
     }
 
+    function endTurn() {
+        var blocks = getOwnedBlocks(currentPlayerId);
+        var winningMove = api.checkForWin(blocks);
+        if (winningMove) {
+            if (!isSimulation){
+                winningMove.forEach(function(bid){
+                    $('#block-'+bid).addClass('highlight');
+                });
+            }
+            gameOver = true;
+        }
+        else if (getOwnedBlocks(emptyBlockPid).length == 0){
+            gameOver = true;
+            drawGame = true;
+        } else {
+            switchPlayer();
+        }
+        displayMessage();
+    }
+
     if (!isSimulation){
         $('#reset').on('click', resetGame);
         $('.block').on('click', function () {
@@ -221,18 +226,27 @@ var boardFactory = function (humanBrain) {
             else{
                 var blockId = $(this).data('id');
                 takeTurn(blockId);
+                if (!gameOver){
+                    endHumanTurn();
+                }
             }
         });
     }
 
     self.resetGame = resetGame;
-    self.loadBrains = function(brain1, brain2, timeout, callback){
+    self.loadBrains = function(brain1, brain2){
         brain1 = brain1 || humanBrain;
         brain2 = brain2 || humanBrain;
         playerBrains = [brain1, brain2];
-        robotTimeout = timeout == null ? 500 : timeout;
-        gameOverCallback = callback;
         resetGame();
     };
+    self.startRobotTurn = startRobotTurn;
+    self.result = function(){
+        return {
+            drawGame: drawGame,
+            gameOver: gameOver,
+            winner: getCurrentPlayer(),
+        };
+    }
     return self;
 };
