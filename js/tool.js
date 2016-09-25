@@ -1,42 +1,52 @@
 
-var Cookie = function(){
-
-//http://stackoverflow.com/a/24103596/6461842
-
-function createCookie(name,value,days) {
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime()+(days*24*60*60*1000));
-        var expires = "; expires="+date.toGMTString();
-    }
-    else var expires = "";
-    document.cookie = name+"="+value+expires+"; path=/";
-}
-
-function readCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0;i < ca.length;i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-    }
-    return null;
-}
-
-function eraseCookie(name) {
-    createCookie(name,"",-1);
-}
-
-return {
-    createCookie: createCookie,
-    readCookie: readCookie,
-};
-
-}();
-
 var Tool = function(){
 var self = {};
+
+var cookieKey = "t4-code";
+self.saveCode = function(code){
+    try {
+        if (localStorage) {
+            localStorage.setItem(cookieKey, code);
+        } else {
+            console.log("browser doesn't support localStorage")
+        }
+    }
+    catch (err) {
+        alert(err.Description);
+    }
+};
+
+self.loadCode = function(){
+    if (localStorage) {
+        return localStorage.getItem(cookieKey);
+    }
+    else {
+        console.log("browser doesn't support localStorage");
+        return null;
+    }
+};
+
+self.exportGist = function(code){
+    var data = {
+        "description": "posting gist test",
+        "public": false,
+        "files": {
+            "test.txt": {
+                "content": code,
+            }
+        }
+    };
+    $.ajax({
+        url: 'https://api.github.com/gists',
+        type: 'POST',
+        dataType: 'json',
+        data: JSON.stringify(data)
+    }).success( function(e) {
+        console.log(e);
+    }).error( function(e) {
+        console.warn("gist save error", e);
+    });
+};
 
 self.format = function(str) {
     var args = arguments;

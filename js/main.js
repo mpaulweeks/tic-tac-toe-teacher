@@ -1,49 +1,6 @@
 
 function ticTacToe(){
 
-    var cookieKey = "t4-code";
-    function saveCodeBrowser(code){
-        try {
-            if (localStorage) {
-                localStorage.setItem(cookieKey, code);
-            } else {
-                Cookie.createCookie(cookieKey, code, 7);
-            }
-        }
-        catch (err) {
-            alert(err.Description);
-        }
-    }
-
-    function loadCodeBrowser(){
-        if (localStorage) {
-            return localStorage.getItem(cookieKey);
-        }
-        return Cookie.readCookie(cookieKey);
-    }
-
-    function exportGist(code){
-        var data = {
-            "description": "posting gist test",
-            "public": false,
-            "files": {
-                "test.txt": {
-                    "content": code,
-                }
-            }
-        };
-        $.ajax({
-            url: 'https://api.github.com/gists',
-            type: 'POST',
-            dataType: 'json',
-            data: JSON.stringify(data)
-        }).success( function(e) {
-            console.log(e);
-        }).error( function(e) {
-            console.warn("gist save error", e);
-        });
-    }
-
     var humanBrain = {
         name: "Human",
         isRobot: false,
@@ -101,7 +58,7 @@ function ticTacToe(){
 
     $('#save-reload').click(function (){
         var code = editorCode.getValue();
-        saveCodeBrowser(code);
+        Tool.saveCode(code);
         var robot = robotFactory(code);
         loadRobot(robot);
     });
@@ -119,18 +76,18 @@ function ticTacToe(){
             }
         };
         var code = editorCode.getValue();
-        saveCodeBrowser(code);
+        Tool.saveCode(code);
         var robot = robotFactory(code);
         presetRobots.forEach(function (pr){
             simulate(robot, pr, callback);
         });
     });
     $('#export-gist').click(function (){
-        exportGist(editorCode.getValue())
+        Tool.exportGist(editorCode.getValue())
     });
 
     // init
-    var cookieCode = loadCodeBrowser();
+    var cookieCode = Tool.loadCode();
     if (cookieCode){
         var robot = robotFactory(cookieCode);
         loadRobot(robot);
