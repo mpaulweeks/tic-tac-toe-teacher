@@ -39,7 +39,7 @@ var robotFactory = function(robotFuncText, robotName, isVisible){
     if (robotName){
         presetRobots.push(self);
     }
-    self.isVisible = isVisible || false;
+    self.isVisible = isVisible || Tool.readUrlParam("debug") || false;
     return self;
 }
 
@@ -53,10 +53,10 @@ return api.getRandom(board.freeSquares);
 
 var mediumRobot = robotFactory(
 `
-function determineWinningMoves(freeSquares, mySquares){
+function determineWinningMoves(mySquares){
     var winningMoves = [];
-    for (var i = 0; i < freeSquares.length; i++){
-        var hypoMove = freeSquares[i];
+    for (var i = 0; i < board.freeSquares.length; i++){
+        var hypoMove = board.freeSquares[i];
         var hypoSquares = mySquares.concat(hypoMove);
         if (api.checkForWin(hypoSquares)){
             winningMoves.push(hypoMove);
@@ -65,11 +65,11 @@ function determineWinningMoves(freeSquares, mySquares){
     return winningMoves;
 }
 return (
-    api.getRandom(determineWinningMoves(board.freeSquares, board.mySquares)) ||
-    api.getRandom(determineWinningMoves(board.freeSquares, board.opponentSquares)) ||
+    api.getRandom(determineWinningMoves(board.mySquares)) ||
+    api.getRandom(determineWinningMoves(board.opponentSquares)) ||
     api.getRandom(board.freeSquares)
 );
-`, "Medium Robot", true);
+`, "Obvious Robot", true);
 
 var expertRobot = robotFactory(
 `
@@ -111,4 +111,118 @@ return (
     api.getRandom(api.intersect(board.freeSquares, square.CORNERS)) ||
     api.getRandom(board.freeSquares)
 );
-`, "Expert Robot", false);
+`, "Clever Robot", false);
+
+var perfectRobot = robotFactory(
+`
+function determineWinningMoves(freeSquares, mySquares){
+    var winningMoves = [];
+    for (var i = 0; i < freeSquares.length; i++){
+        var hypoMove = freeSquares[i];
+        var hypoSquares = mySquares.concat(hypoMove);
+        if (api.checkForWin(hypoSquares)){
+            winningMoves.push(hypoMove);
+        }
+    }
+    return winningMoves;
+}
+function determinePincerMoves(freeSquares, mySquares){
+    var pincerMoves = [];
+    for (var i = 0; i < freeSquares.length; i++){
+        var hypoMove = freeSquares[i];
+        var hypoFreeSquares = (
+            freeSquares.slice(0, i).concat(freeSquares.slice(i+1))
+        );
+        var hypoMySquares = mySquares.concat(hypoMove);
+        if (determineWinningMoves(hypoFreeSquares, hypoMySquares).length >= 2){
+            pincerMoves.push(hypoMove);
+        }
+    }
+    return pincerMoves;
+}
+function getRandomFree(choices){
+    return api.getRandom(
+        api.intersect(choices, board.freeSquares)
+    );
+}
+function equiv(list1, list2){
+    return (
+        list1.length == list2.length &&
+        api.intersect(list1, list2).length == list1.length
+    );
+}
+
+var move = (
+    getRandomFree(determineWinningMoves(board.freeSquares, board.mySquares)) ||
+    getRandomFree(determineWinningMoves(board.freeSquares, board.opponentSquares))
+);
+if (move){
+    return move;
+}
+
+var countMoves = 9 - board.freeSquares.length;
+switch (countMoves){
+    case 0:
+        move = square.Center;
+        break;
+    case 2:
+        var oppMove = board.opponentSquares[0];
+        var res = {};
+        res[square.TopCenter] = [square.BottomLeft, square.BottomRight];
+        res[square.BottomCenter] = [square.TopLeft, square.TopRight];
+        res[square.CenterLeft] = [square.TopRight, square.BottomRight];
+        res[square.CenterRight] = [square.BottomLeft, square.TopLeft];
+        res[square.TopLeft] = [square.BottomRight];
+        res[square.TopRight] = [square.BottomLeft];
+        res[square.BottomLeft] = [square.TopRight];
+        res[square.BottomRight] = [square.TopLeft];
+        move = getRandomFree(res[oppMove]);
+        break;
+    case 4:
+        move = getRandomFree(determinePincerMoves(board.freeSquares, board.mySquares));
+        break;
+    case 1:
+        var oppMove = board.opponentSquares[0];
+        if (oppMove == square.Center){
+            move = getRandomFree(square.CORNERS);
+        } else {
+            move = square.Center;
+        }
+        break;
+    case 3:
+        var myMove = board.mySquares[0];
+        var oppCornerCount = api.intersect(board.opponentSquares, square.CORNERS).length;
+        if (myMove == square.Center){
+            switch(oppCornerCount){
+                case 2:
+                    move = getRandomFree(square.SIDES);
+                    break;
+                case 1:
+                    var oppCorner = api.intersect(board.opponentSquares, square.CORNERS)[0];
+                    var res = {};
+                    res[square.TopLeft] = [square.BottomRight];
+                    res[square.TopRight] = [square.BottomLeft];
+                    res[square.BottomLeft] = [square.TopRight];
+                    res[square.BottomRight] = [square.TopLeft];
+                    move = getRandomFree(res[oppCorner]);
+                    break;
+                case 0:
+                    if (equiv(board.opponentSquares, [square.TopCenter, square.CenterLeft])){
+                        move = square.TopLeft;
+                    } else if (equiv(board.opponentSquares, [square.TopCenter, square.CenterRight])){
+                        move = square.TopRight;
+                    } else if (equiv(board.opponentSquares, [square.BottomCenter, square.CenterLeft])){
+                        move = square.BottomLeft;
+                    } else if (equiv(board.opponentSquares, [square.BottomCenter, square.CenterRight])){
+                        move = square.BottomRight;
+                    }
+                    break;
+            }
+        } else {
+            move = getRandomFree(square.CORNERS);
+        }
+        break;
+}
+
+return move || api.getRandom(board.freeSquares);
+`, "Flawless Robot", false);
