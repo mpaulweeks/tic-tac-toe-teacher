@@ -42,16 +42,18 @@ function simulate(brain1, brain2, callback){
     return out;
   }
   var printResults = function(rawStats){
-    var html = (
-      'Going 1st - Win: {1}% - Lose: {2}% - Draw: {3}%<br/>' +
-      'Going 2nd - Win: {4}% - Lose: {5}% - Draw: {6}%'
-    );
+      // 'Going 1st - Win: {1}% - Lose: {2}% - Draw: {3}%<br/>'
+      // 'Going 2nd - Win: {4}% - Lose: {5}% - Draw: {6}%
     var pStats = printableStats(rawStats);
-    out.html(Tool.format(
-      html,
-      pStats[0].win, pStats[0].lose, pStats[0].draw,
-      pStats[1].win, pStats[1].lose, pStats[1].draw
-    ));
+    out.html(`
+      <td>${brain2.name}</td>
+      <td>${pStats[0].win}%</td>
+      <td>${pStats[0].lose}%</td>
+      <td>${pStats[0].draw}%</td>
+      <td>${pStats[1].win}%</td>
+      <td>${pStats[1].lose}%</td>
+      <td>${pStats[1].draw}%</td>
+    `);
   };
   var combineStats = function(stats1, stats2){
     if (stats1){
@@ -65,10 +67,7 @@ function simulate(brain1, brain2, callback){
 
   var overallStats = [];
   var divId = "sim-" + brain2.id;
-  $('#sim-results').append(Tool.format(
-    '<h4>vs {1}</h4><div id="{2}"></div>',
-    brain2.name, divId
-  ));
+  $('#sim-results').append(`<tr id="${divId}"></tr>`);
   var out = $('#' + divId);
   out.html("calculating...");
   var runSim = true;
@@ -81,7 +80,7 @@ function simulate(brain1, brain2, callback){
     simBoard.loadBrains(brain2, brain1);
     overallStats[1] = combineStats(overallStats[1], simManyGames(count));
     printResults(overallStats);
-    if (overallStats[0].total < 1000){
+    if (overallStats[0].total < 5000){
       setTimeout(function (){
         calcStats(count + 100);
       }, 0);

@@ -49,3 +49,21 @@ body {
   text-align: left;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
+
+table {
+  border-collapse: collapse;
+  margin: 10px auto;
+}
+
+table, th, td {
+  border: 1px solid black;
+  padding: 4px;
+  text-align: center;
+}
+th {
+  padding: 8px;
+}
+
+td:first-child {
+  text-align: left;
+}
