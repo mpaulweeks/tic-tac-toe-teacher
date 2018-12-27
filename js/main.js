@@ -1,5 +1,6 @@
 
-function ticTacToe(){
+// app start
+(function (){
 
     var humanBrain = {
         name: "Human",
@@ -94,4 +95,4 @@ function ticTacToe(){
     } else {
         loadRobot(simpleRobot);
     }
-}
+})()
