@@ -1,97 +1,104 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <title>T4</title>
-        <link rel="shortcut icon" href="img/block_x.png" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="viewport" content="width=400">
-        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
-        <link rel="stylesheet" type="text/css" href="css/t4.css" />
-        <script defer src="js/jquery-1-9-1.min.js"></script>
-        <script defer src="js/bootstrap.min.js"></script>
-        <script defer src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-        <script defer src="js/tool.js"></script>
-        <script defer src="js/board.js"></script>
-        <script defer src="js/robot.js"></script>
-        <script defer src="js/sim.js"></script>
-        <script defer src="js/constant.js"></script>
-        <script defer src="js/main.js"></script>
-    </head>
+  <head>
+    <title>T4</title>
+    <link rel="shortcut icon" href="img/block_x.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=400">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/t4.css" />
+    <script defer src="js/jquery-1-9-1.min.js"></script>
+    <script defer src="js/bootstrap.min.js"></script>
+    <script defer src="js/ace/ace.js"></script>
+    <script defer src="js/tool.js"></script>
+    <script defer src="js/board.js"></script>
+    <script defer src="js/robot.js"></script>
+    <script defer src="js/sim.js"></script>
+    <script defer src="js/constant.js"></script>
+    <script defer src="js/main.js"></script>
+  </head>
 
 <body>
-<div class="container text-center">
-<h1 >
-    Tic Tac Toe Teacher
-</h1>
+  <div class="container text-center">
+    <h1>
+      Tic Tac Toe Teacher
+    </h1>
 
-<div class="col-md-5">
-  <div class="tab-content">
-    <ul id="tabs-left" class="nav nav-tabs" data-tabs="tabs">
-        <li class="active"><a href="#board" data-toggle="tab">Game Board</a></li>
-        <li><a href="#sim" data-toggle="tab">Simulator</a></li>
-        <li><a href="#preset" data-toggle="tab">Presets</a></li>
-        <li><a href="#docs" data-toggle="tab">Code Reference</a></li>
-    </ul>
-    <div role="tabpanel" class="tab-pane active" id="board">
-        <h3 id="message">
+    <!-- left column -->
+    <div class="col-md-5">
+      <div class="tab-content">
+        <ul id="tabs-left" class="nav nav-tabs" data-tabs="tabs">
+          <li class="active"><a href="#board" data-toggle="tab">Game Board</a></li>
+          <li><a href="#sim" data-toggle="tab">Simulator</a></li>
+          <li><a href="#preset" data-toggle="tab">Presets</a></li>
+          <li><a href="#docs" data-toggle="tab">Code Reference</a></li>
+        </ul>
+        <div role="tabpanel" class="tab-pane active" id="board">
+          <h3 id="message">
             loading...
-        </h3>
-        <br/>
-        <div class="holder center-block">
+          </h3>
+          <br/>
+          <div class="holder center-block">
             <div id="block-1" data-id="1" class="block"></div>
             <div id="block-2" data-id="2" class="block"></div>
             <div id="block-3" data-id="3" class="block"></div>
             <div class="float-clear"></div>
-        </div>
-        <div class="holder center-block">
+          </div>
+          <div class="holder center-block">
             <div id="block-4" data-id="4" class="block"></div>
             <div id="block-5" data-id="5" class="block"></div>
             <div id="block-6" data-id="6" class="block"></div>
             <div class="float-clear"></div>
-        </div>
-        <div class="holder center-block">
+          </div>
+          <div class="holder center-block">
             <div id="block-7" data-id="7" class="block"></div>
             <div id="block-8" data-id="8" class="block"></div>
             <div id="block-9" data-id="9" class="block"></div>
             <div class="float-clear"></div>
-        </div>
-        <div>
+          </div>
+          <div>
             <br/>
             <button id="reset">Reset Game</button>
             <button id="save-reload">Save and Reload Code</button>
             <br/>
             <br/>
             <form id="settings">
-                <input type="radio" name="turn" value="0" checked> Robot plays first<br/>
-                <input type="radio" name="turn" value="1"> Robot plays second
+              <input type="radio" name="turn" value="0" checked> Robot plays first<br/>
+              <input type="radio" name="turn" value="1"> Robot plays second
             </form>
+          </div>
         </div>
-    </div>
-    <div role="tabpanel" class="tab-pane" id="sim">
-        <div id="sim-ready">
+        <div role="tabpanel" class="tab-pane" id="sim">
+          <div id="sim-ready">
             <br/>
             <button id="run-simulator">Save and Run Simulators</button>
             <br/>
+          </div>
+          <h3 id="sim-thinking"> Running Simulators, please wait... </h3>
+          <div id="sim-results">
+            <!-- filled via JS -->
+          </div>
         </div>
-        <h3 id="sim-thinking"> Running Simulators, please wait... </h3>
-        <div id="sim-results"></div>
+        <div role="tabpanel" class="tab-pane" id="preset">
+          <h3> Presets </h3>
+          <br/>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="docs">
+          <div class="code" id="editor-docs">
+            <!-- filled via JS -->
+          </div>
+        </div>
+      </div>
     </div>
-    <div role="tabpanel" class="tab-pane" id="preset">
-        <h3> Presets </h3><br/>
-    </div>
-    <div role="tabpanel" class="tab-pane" id="docs">
-        <div class="code" id="editor-docs"></div>
+
+    <!-- right column -->
+    <div class="col-md-7">
+      <!-- <button id="export-gist">Export Gist</button> -->
+      <div class="code-bookend" id="pre-code"></div>
+      <div class="code" id="editor-code"></div>
+      <div class="code-bookend" id="post-code"></div>
     </div>
   </div>
-</div>
-<div class="col-md-7">
-    <!-- <button id="export-gist">Export Gist</button> -->
-    <div class="code-bookend" id="pre-code"></div>
-    <div class="code" id="editor-code"></div>
-    <div class="code-bookend" id="post-code"></div>
-</div>
-
-</div>
 </body>
 </html>
