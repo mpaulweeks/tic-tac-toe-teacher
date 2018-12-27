@@ -1,7 +1,5 @@
 
-
-var codeDocs = (
-`
+var codeDocs = `
 ////////////////////
 // board & square //
 ////////////////////
@@ -24,7 +22,7 @@ square.BottomRight;
 
 // example usage
 if (board.freeSquares.includes(square.Center)){
-    return square.Center;
+  return square.Center;
 }
 
 // for convenience, square also has:
@@ -46,7 +44,7 @@ api.checkForWin(squares);
 // example usage
 var nextTurn = board.mySquares.concat(square.BottomRight);
 if (api.checkForWin(nextTurn)){
-    return square.BottomRight;
+  return square.BottomRight;
 }
 
 
@@ -63,8 +61,8 @@ api.intersect(squares1, squares2);
 var freeCorners = api.intersect(board.freeSquares, square.CORNERS);
 var cornerMove = api.getRandom(freeCorners);
 if (cornerMove != null){
-    return cornerMove;
+  return cornerMove;
 } else {
-    // do something else
+  // do something else
 }
-`);
+`;
