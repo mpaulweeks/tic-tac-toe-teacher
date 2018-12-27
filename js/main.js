@@ -71,7 +71,8 @@
   $('#run-simulator').click(function(){
     $('#sim-ready').hide();
     $('#sim-thinking').show();
-    $('#sim-results').empty();
+    $('#sim-1-results').empty();
+    $('#sim-2-results').empty();
     var count = presetRobots.length;
     var callback = function(){
       count -= 1;

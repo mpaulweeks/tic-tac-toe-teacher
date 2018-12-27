@@ -50,6 +50,10 @@ body {
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
 }
 
+#sim-results h4 {
+  text-decoration: underline;
+}
+
 table {
   border-collapse: collapse;
   margin: 10px auto;

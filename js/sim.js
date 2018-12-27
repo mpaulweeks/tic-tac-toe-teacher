@@ -41,19 +41,22 @@ function simulate(brain1, brain2, callback){
     });
     return out;
   }
-  var printResults = function(rawStats){
+  var printResults = function(brainId, rawStats){
       // 'Going 1st - Win: {1}% - Lose: {2}% - Draw: {3}%<br/>'
       // 'Going 2nd - Win: {4}% - Lose: {5}% - Draw: {6}%
     var pStats = printableStats(rawStats);
-    out.html(`
+    document.getElementById(`sim-1-${brainId}`).innerHTML = `
       <td>${brain2.name}</td>
       <td>${pStats[0].win}%</td>
       <td>${pStats[0].lose}%</td>
       <td>${pStats[0].draw}%</td>
+    `;
+    document.getElementById(`sim-2-${brainId}`).innerHTML = `
+      <td>${brain2.name}</td>
       <td>${pStats[1].win}%</td>
       <td>${pStats[1].lose}%</td>
       <td>${pStats[1].draw}%</td>
-    `);
+    `;
   };
   var combineStats = function(stats1, stats2){
     if (stats1){
@@ -66,10 +69,9 @@ function simulate(brain1, brain2, callback){
   };
 
   var overallStats = [];
-  var divId = "sim-" + brain2.id;
-  $('#sim-results').append(`<tr id="${divId}"></tr>`);
-  var out = $('#' + divId);
-  out.html("calculating...");
+  $('#sim-1-results').append(`<tr id="sim-1-${brain2.id}"></tr>`);
+  $('#sim-2-results').append(`<tr id="sim-2-${brain2.id}"></tr>`);
+
   var runSim = true;
   $('#cancel-sim').click(function (){
     runSim = false;
@@ -79,7 +81,7 @@ function simulate(brain1, brain2, callback){
     overallStats[0] = combineStats(overallStats[0], simManyGames(count));
     simBoard.loadBrains(brain2, brain1);
     overallStats[1] = combineStats(overallStats[1], simManyGames(count));
-    printResults(overallStats);
+    printResults(brain2.id, overallStats);
     if (overallStats[0].total < 5000){
       setTimeout(function (){
         calcStats(count + 100);

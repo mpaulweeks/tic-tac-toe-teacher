@@ -78,22 +78,36 @@
             <br/>
           </div>
           <h3 id="sim-thinking"> Running Simulators, please wait... </h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Robot</th>
-                <th>Going 1st<br/>Win %</th>
-                <th>Going 1st<br/>Lose %</th>
-                <th>Going 1st<br/>Tie %</th>
-                <th>Going 2nd<br/>Win %</th>
-                <th>Going 2nd<br/>Lose %</th>
-                <th>Going 2nd<br/>Tie %</th>
-              </tr>
-            </thead>
-            <tbody id="sim-results">
-              <!-- filled via JS -->
-            </tbody>
-          </table>
+          <div id="sim-results">
+            <h4> Going First </h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Robot</th>
+                  <th>Win %</th>
+                  <th>Lose %</th>
+                  <th>Tie %</th>
+                </tr>
+              </thead>
+              <tbody id="sim-1-results">
+                <!-- filled via JS -->
+              </tbody>
+            </table>
+            <h4> Going Second </h4>
+            <table>
+              <thead>
+                <tr>
+                  <th>Robot</th>
+                  <th>Win %</th>
+                  <th>Lose %</th>
+                  <th>Tie %</th>
+                </tr>
+              </thead>
+              <tbody id="sim-2-results">
+                <!-- filled via JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
         <div role="tabpanel" class="tab-pane" id="preset">
           <h3> Presets </h3>
