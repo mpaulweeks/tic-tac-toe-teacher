@@ -2,8 +2,14 @@
 
 <html>
 <head>
-  <title>T4</title>
-  <link rel="shortcut icon" href="img/block_x.png" />
+  <title>Tic-Tac-Toe Teacher</title>
+  <link rel="shortcut icon" href="favicon.png" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Tic-Tac-Toe Teacher" />
+  <meta property="og:url" content="https://mpaulweeks.github.io/tic-tac-toe-teacher" />
+  <meta property="og:image" content="https://mpaulweeks.github.io/tic-tac-toe-teacher/favicon.png" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="viewport" content="width=400">
 
@@ -24,7 +30,7 @@
 <body>
   <div class="container text-center">
     <h1>
-      Tic Tac Toe Teacher
+      Tic-Tac-Toe Teacher
     </h1>
 
     <!-- left column -->
@@ -107,6 +113,10 @@
                 <!-- filled via JS -->
               </tbody>
             </table>
+            <div>
+              <span id="sim-count">0</span>
+              games played
+            </div>
           </div>
         </div>
         <div role="tabpanel" class="tab-pane" id="preset">

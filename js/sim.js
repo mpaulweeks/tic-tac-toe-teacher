@@ -57,6 +57,7 @@ function simulate(brain1, brain2, callback){
       <td>${pStats[1].lose}%</td>
       <td>${pStats[1].draw}%</td>
     `;
+    document.getElementById(`sim-count`).innerHTML = rawStats[0].total;
   };
   var combineStats = function(stats1, stats2){
     if (stats1){
@@ -84,7 +85,7 @@ function simulate(brain1, brain2, callback){
     printResults(brain2.id, overallStats);
     if (overallStats[0].total < 5000){
       setTimeout(function (){
-        calcStats(count + 100);
+        calcStats(count);
       }, 0);
     } else {
       callback();
